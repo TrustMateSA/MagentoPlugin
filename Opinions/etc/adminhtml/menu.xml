@@ -1,0 +1,28 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="TrustMate_Opinions::menu"
+             title="TrustMate"
+             module="TrustMate_Opinions"
+             sortOrder="10"
+             resource="TrustMate_Opinions::menu"
+        />
+        <add id="TrustMate_Opinions::opinions"
+             title="Products Opinion"
+             module="TrustMate_Opinions"
+             sortOrder="10"
+             translate="title"
+             parent="TrustMate_Opinions::menu"
+             resource="Magento_Backend::content"
+             action="opinions/grid"
+        />
+        <add id="TrustMate_Opinions::settings"
+             title="Settings"
+             module="TrustMate_Opinions"
+             sortOrder="20"
+             translate="title"
+             parent="TrustMate_Opinions::menu"
+             resource="TrustMate_Opinions::settings"
+             action="adminhtml/system_config/edit/section/trustmate_opinions_section"
+        />
+    </menu>
+</config>

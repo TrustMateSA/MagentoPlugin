@@ -174,11 +174,6 @@ class Curl
             $config[CURLOPT_POST] = true;
         }
 
-        if (API::DEVELOPER_MODE) {
-            $auth = API::AUTH_LOGIN . ':' . API::AUTH_PASS;
-            $config[CURLOPT_USERPWD] = "$auth";
-        }
-
         return $config;
     }
 }

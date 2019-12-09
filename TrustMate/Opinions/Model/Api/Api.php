@@ -14,10 +14,7 @@ use TrustMate\Opinions\Api\ApiInterface;
  */
 class Api extends Curl implements ApiInterface
 {
-    const API_URI = 'https://stage.api.trustmate.io/v0/';
-    const DEVELOPER_MODE = true;
-    const AUTH_LOGIN = 'fwc';
-    const AUTH_PASS = 'SaithieM8va0vie';
+    const API_URI = 'https://api.trustmate.io/v0/';
 
     /**
      * Create invitation to shop opinion

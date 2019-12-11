@@ -47,14 +47,14 @@ class InstallSchema implements InstallSchemaInterface
             )
             ->addColumn(
                 'created_at',
-                Table::TYPE_TEXT,
+                Table::TYPE_DATETIME,
                 null,
                 ['nullable' => false],
                 'Created at'
             )
             ->addColumn(
                 'grade',
-                Table::TYPE_TEXT,
+                Table::TYPE_SMALLINT,
                 null,
                 ['nullable' => false],
                 'Grade'

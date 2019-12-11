@@ -127,15 +127,7 @@ class UpgradeData implements UpgradeDataInterface
             ->setEntityId(1)
             ->save();
 
-        $ratingOptions = array(
-            '1' => '1',
-            '2' => '2',
-            '3' => '3',
-            '4' => '4',
-            '5' => '5',
-        );
-
-        foreach ($ratingOptions as $key => $optionCode) {
+        foreach (range(1,5) as $optionCode) {
             $this->ratingOption->create()->setCode($optionCode)
                 ->setValue($optionCode)
                 ->setRatingId($rating->getId())

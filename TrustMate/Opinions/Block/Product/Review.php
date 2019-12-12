@@ -58,7 +58,7 @@ class Review extends ProductReview
         );
 
         if (!$this->helper->isProductsOpinionsEnabled()) {
-            $collection->addFieldToFilter('title' , array('neq' => Data::OPINION_TITLE));
+            $collection->addFieldToFilter('title', array('neq' => Data::OPINION_TITLE));
         }
 
         return $collection->getSize();

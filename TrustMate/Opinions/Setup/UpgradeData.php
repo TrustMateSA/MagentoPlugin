@@ -10,6 +10,7 @@ use Magento\CheckoutAgreements\Model\AgreementFactory;
 use Magento\CheckoutAgreements\Api\CheckoutAgreementsRepositoryInterface;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
+use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
@@ -91,6 +92,10 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), '1.0.2') < 0) {
             $this->addTrustMateRating();
         }
+
+        if (version_compare($context->getVersion(), '1.0.3') < 0) {
+            $this->addIdentifierToTrustMateTable($setup);
+        }
     }
 
     /**
@@ -148,5 +153,22 @@ class UpgradeData implements UpgradeDataInterface
         }
 
         return $ids;
+    }
+
+    /**
+     * @param $setup
+     */
+    public function addIdentifierToTrustMateTable($setup)
+    {
+        $setup->getConnection()
+            ->addColumn(
+                InstallSchema::PRODUCT_OPINIONS_TABLE,
+                'public_identifier',
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => false,
+                    'comment' => 'Unique identifier'
+                ]
+            );
     }
 }

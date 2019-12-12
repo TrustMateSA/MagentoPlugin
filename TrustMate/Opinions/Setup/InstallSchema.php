@@ -24,9 +24,7 @@ class InstallSchema implements InstallSchemaInterface
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
-
         $this->createProductOpinionsTable($setup);
-
         $setup->endSetup();
     }
 

@@ -107,7 +107,7 @@ class CheckoutAgreementsRepository extends CoreCheckoutAgreementsRepository
         $agreementCollection->addFieldToFilter('is_active', 1);
 
         if (!$this->helper->collectAgreementsWithTrustMate()) {
-            $agreementCollection->addFieldToFilter('name' , array('neq' => Data::TRUSTMATE_CODE));
+            $agreementCollection->addFieldToFilter('name', array('neq' => Data::TRUSTMATE_CODE));
         }
 
         $agreementDataObjects = [];

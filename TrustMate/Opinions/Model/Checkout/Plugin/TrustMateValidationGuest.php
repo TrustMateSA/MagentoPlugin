@@ -84,12 +84,12 @@ class TrustMateValidationGuest
         if ($this->helper->isShopOpinionsEnabled() || $this->helper->isProductsOpinionsEnabled()) {
             $agreements = $paymentMethod->getExtensionAttributes() === null ? array() : $paymentMethod->getExtensionAttributes()->getAgreementIds();
             $agreementsList = $this->collectionFactory->create()
-                ->addFieldToFilter('is_active' , 1)
-                ->addFieldToFilter('name' , Data::TRUSTMATE_CODE);;
+                ->addFieldToFilter('is_active', 1)
+                ->addFieldToFilter('name', Data::TRUSTMATE_CODE);
             $trustMateAgreementId = $agreementsList->getFirstItem()->getId();
             $collectAgreementsWithTrustMate = $this->helper->collectAgreementsWithTrustMate();
 
-            if (!$collectAgreementsWithTrustMate || ($collectAgreementsWithTrustMate && in_array($trustMateAgreementId , $agreements))) {
+            if (!$collectAgreementsWithTrustMate || ($collectAgreementsWithTrustMate && in_array($trustMateAgreementId, $agreements))) {
                 $order = $this->orderRepository->get($orderId);
 
                 $shipping = $order->getShippingAddress();

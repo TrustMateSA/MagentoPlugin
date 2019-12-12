@@ -40,7 +40,7 @@ class View
     public function afterGetReviewsCollection($subject, $result)
     {
         if (!$this->helper->isProductsOpinionsEnabled()) {
-            return $result->addFieldToFilter('title' , array('neq' => Data::OPINION_TITLE));
+            return $result->addFieldToFilter('title', array('neq' => Data::OPINION_TITLE));
         }
 
         return $result;

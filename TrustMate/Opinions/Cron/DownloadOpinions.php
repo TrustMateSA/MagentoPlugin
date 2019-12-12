@@ -7,12 +7,16 @@
 namespace TrustMate\Opinions\Cron;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Review\Model\RatingFactory;
 use Magento\Review\Model\Review;
 use Magento\Review\Model\ReviewFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use TrustMate\Opinions\Helper\Data;
+use TrustMate\Opinions\Logger\Logger;
 use TrustMate\Opinions\Model\Api\Api;
 use TrustMate\Opinions\Model\ProductOpinionsFactory;
 use TrustMate\Opinions\Model\ResourceModel\ProductOpinions\CollectionFactory as ReviewsCollectionFactory;
@@ -69,6 +73,11 @@ class DownloadOpinions
     protected $ratingFactory;
 
     /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * DownloadOpinions constructor.
      * @param Api                        $api
      * @param ProductOpinionsFactory     $opinion
@@ -79,6 +88,7 @@ class DownloadOpinions
      * @param ReviewsCollectionFactory   $reviewsCollection
      * @param Data                       $helper
      * @param RatingFactory              $ratingFactory
+     * @param Logger                     $logger
      */
     public function __construct(
         Api                        $api,
@@ -89,101 +99,93 @@ class DownloadOpinions
         ProductRepositoryInterface $productRepository,
         ReviewsCollectionFactory   $reviewsCollection,
         Data                       $helper,
-        RatingFactory              $ratingFactory
+        RatingFactory              $ratingFactory,
+        Logger                     $logger
     ) {
-        $this->helper   = $helper;
-        $this->api      = $api;
-        $this->opinion  = $opinion;
-        $this->timezone = $timezone;
-        $this->reviewFactory = $reviewFactory;
-        $this->storeManager  = $storeManager;
+        $this->helper            = $helper;
+        $this->api               = $api;
+        $this->opinion           = $opinion;
+        $this->timezone          = $timezone;
+        $this->reviewFactory     = $reviewFactory;
+        $this->storeManager      = $storeManager;
         $this->productRepository = $productRepository;
         $this->reviewsCollection = $reviewsCollection;
-        $this->ratingFactory = $ratingFactory;
+        $this->ratingFactory     = $ratingFactory;
+        $this->logger            = $logger;
     }
 
     /**
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * Download and saving opinions from external api
      */
-    public function execute() {
-        if ($this->helper->isProductsOpinionsEnabled()) {
-            $date = $this->timezone->date();
-            $endDate = $date->format('Y-m-d H:i:s');
+    public function execute()
+    {
+        if (!$this->helper->isProductsOpinionsEnabled()) {
+            return;
+        }
 
-            $collection = $this->reviewsCollection->create();
-            $collection->addFieldToSelect('created_at');
-            $collection->setOrder('created_at' , 'DESC');
-            $newest = $collection->getFirstItem();
-            $fromDate = NULL;
+        $date = $this->timezone->date();
+        $endDate = $date->format('Y-m-d H:i:s');
+        $newest = $this->getNewestOpinion();
 
-            if ($newest->getCreatedAt()) {
-                $fromDate = $newest->getCreatedAt();
-                $fromDate = new \DateTime("@" . strtotime($fromDate));
-                $fromDate->modify("+1 second");
-                $fromDate = $fromDate->format("Y-m-d H:i:s");
+        $data = array(
+            "start" => $newest->getCreatedAt(),
+            "end" => $endDate,
+            'per_page' => 20
+        );
+        $page = 1;
+        $stores = $this->getStores();
+        $storeId = $this->storeManager->getStore()->getId();
+
+        do {
+            $data['page'] = $page;
+            $opinions = $this->api->getProductReview($data);
+
+            if (!is_array($opinions) || !isset($opinions['pages']) || !isset($opinions['items'])) {
+                return;
             }
 
-            $opinions = $this->api->getProductReview(
-                array(
-                    "start" => $fromDate,
-                    "end" => $endDate,
-                    "page" => 1,
-                    'per_page' => 20
-                )
-            );
+            foreach ($opinions['items'] as $opinion) {
+                if (!isset($opinion['product']) || !isset($opinion['product']['gtin']) || !isset($opinion['public_identifier'])) {
+                    return;
+                }
 
-            if (is_array($opinions) && isset($opinions['items'])) {
-                foreach ($opinions['items'] as $opinion) {
-                    if (isset($opinion['product']) && isset($opinion['product']['gtin'])) {
-                        $opinion['product'] = $opinion['product']['gtin'];
+                $opinion['product'] = $opinion['product']['gtin'];
+
+                try {
+                    if ($this->opinionExist($opinion['public_identifier'])) {
+                        continue;
                     }
 
-                    $reviewModel = $this->opinion->create();
-                    $reviewModel->setData($opinion);
-                    $reviewModel->save();
+                    $trustmateOpinion = $this->saveTrustmateOpinion($opinion);
+                    $product = $this->productRepository->get($trustmateOpinion->getProduct());
 
                     $reviewData = array(
                         'title' => Data::OPINION_TITLE,
-                        'detail' => $reviewModel->getBody(),
-                        'nickname' => $reviewModel->getAuthorName(),
+                        'detail' => $trustmateOpinion->getBody(),
+                        'nickname' => $trustmateOpinion->getAuthorName(),
+                        'grade' => $trustmateOpinion->getGrade()
                     );
 
-                    $product = $this->productRepository->get($reviewModel->getProduct());
-
-                    if ($product->getId()) {
-                        $review = $this->reviewFactory->create()->setData($reviewData);
-                        $review->setEntityId($review->getEntityIdByCode(Review::ENTITY_PRODUCT_CODE))
-                            ->setEntityPkValue($product->getId())
-                            ->setStatusId(Review::STATUS_APPROVED)
-                            ->setStoreId($this->storeManager->getStore()->getId())
-                            ->setStores($this->getStoresId())
-                            ->save();
-
-                        $trustmateRating = $this->ratingFactory->create()
-                            ->getResourceCollection()
-                            ->addFieldToFilter('rating_code', Data::TRUSTMATE_CODE)
-                            ->getFirstItem()
-                            ->getData()
-                        ;
-
-                        $this->ratingFactory->create()
-                            ->setRatingId($trustmateRating['rating_id'])
-                            ->setReviewId($review->getId())
-                            ->addOptionVote($reviewModel->getGrade(), $product->getId());
-                        ;
-
-                        $review->aggregate();
-                    }
+                    $this->saveMagentoOpinion($reviewData, $product->getId(), $stores, $storeId);
                 }
+                catch (NoSuchEntityException $e) {
+                    $this->logger->critical('Product with sku ' . $opinion['product'] . ' not exist');
+                    continue;
+                }
+                catch (\Exception $e) {
+                    $this->logger->critical($e->getMessage());
+                    continue;
+                };
+
+
             }
-        }
+        } while (isset($opinions['pages']) && $page++ < $opinions['pages']);
     }
 
     /**
      * @return array
      */
-    private function getStoresId() {
+    private function getStores() {
         $stores = $this->storeManager->getStores();
         $ids = array();
 
@@ -192,5 +194,83 @@ class DownloadOpinions
         }
 
         return $ids;
+    }
+
+    /**
+     * @return DataObject
+     */
+    private function getNewestOpinion() {
+        $collection = $this->reviewsCollection->create();
+        $collection->addFieldToSelect('created_at');
+        $collection->setOrder('created_at', 'DESC');
+
+        return $collection->getFirstItem();
+    }
+
+    /**
+     * @param $data
+     * @return \TrustMate\Opinions\Model\ProductOpinions
+     * @throws \Exception
+     */
+    private function saveTrustmateOpinion($data) {
+        $opinion = $this->opinion->create();
+        $opinion->setData($data);
+        $opinion->save();
+
+        return $opinion;
+    }
+
+    /**
+     * @param array $data
+     * @param $productId
+     * @param $stores
+     * @param $storeId
+     * @throws LocalizedException
+     */
+    private function saveMagentoOpinion($data, $productId, $stores, $storeId) {
+        $review = $this->reviewFactory->create()->setData($data);
+        $review->setEntityId($review->getEntityIdByCode(Review::ENTITY_PRODUCT_CODE))
+            ->setEntityPkValue($productId)
+            ->setStatusId(Review::STATUS_APPROVED)
+            ->setStoreId($storeId)
+            ->setStores($stores)
+            ->save();
+
+        if ($review->getEntityId()) {
+            $this->saveRating($data, $productId, $review);
+        }
+
+    }
+
+    /**
+     * @param array $data
+     * @param $productId
+     * @param $review
+     * @throws LocalizedException
+     */
+    private function saveRating($data, $productId, $review) {
+        $trustmateRating = $this->ratingFactory->create()
+            ->getResourceCollection()
+            ->addFieldToFilter('rating_code', Data::TRUSTMATE_CODE)
+            ->getFirstItem()
+            ->getData();
+
+        $this->ratingFactory->create()
+            ->setRatingId($trustmateRating['rating_id'])
+            ->setReviewId($review->getId())
+            ->addOptionVote($data['grade'], $productId);
+
+        $review->aggregate();
+    }
+
+    /**
+     * @param $identifier
+     * @return int
+     */
+    private function opinionExist($identifier) {
+        $collection = $this->reviewsCollection->create();
+        $collection->addFieldToFilter('public_identifier', $identifier);
+
+        return $collection->getSize();
     }
 }

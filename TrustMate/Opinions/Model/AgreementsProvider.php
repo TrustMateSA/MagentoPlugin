@@ -53,7 +53,7 @@ class AgreementsProvider extends CoreAgreementsProvider
             $agreementCollection->addStoreFilter($this->storeManager->getStore()->getId());
             $agreementCollection->addFieldToFilter('is_active', 1);
             $agreementCollection->addFieldToFilter('mode', AgreementModeOptions::MODE_MANUAL);
-            $agreementCollection->addFieldToFilter('name' , array('neq' => Data::TRUSTMATE_CODE));
+            $agreementCollection->addFieldToFilter('name', array('neq' => Data::TRUSTMATE_CODE));
             $agreementIds = $agreementCollection->getAllIds();
         }
         return $agreementIds;

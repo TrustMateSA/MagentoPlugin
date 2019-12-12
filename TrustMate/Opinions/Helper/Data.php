@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * @package   TrustMate\Opinions
  * @copyright 2019 TrustMate

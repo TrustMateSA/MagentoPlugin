@@ -1,0 +1,7 @@
+.review-item.trustmate-opinion .review-title {
+    display: none;
+}
+
+.review-item.trustmate-opinion .trustmate-badge {
+    float: right;
+}

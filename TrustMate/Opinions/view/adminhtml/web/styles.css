@@ -1,0 +1,13 @@
+.trustmate_widget_location {
+    width: 260px;
+    height: 240px;
+    background: url("images/location.png");
+}
+
+.trustmate {
+    margin-left: 2em;
+}
+
+label[for="trustmate_opinions_section_general_instruction"] {
+    display: none;
+}

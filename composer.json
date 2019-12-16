@@ -1,7 +1,6 @@
 {
     "name": "trustmate/opinions",
     "description": "A Magento 2 module",
-    "version": "0.0.1",
     "type": "magent02-module",
     "license": [
         "OSL-3.0"

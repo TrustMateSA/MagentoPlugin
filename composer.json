@@ -1,7 +1,7 @@
 {
-    "name": "trustmate/opinions",
+    "name": "trustmate/magent-extension",
     "description": "A Magento 2 module",
-    "type": "magent02-module",
+    "type": "magento2-module",
     "license": [
         "OSL-3.0"
     ],

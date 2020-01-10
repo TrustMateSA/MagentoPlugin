@@ -1,5 +1,5 @@
 {
-    "name": "trustmate/magent-extension",
+    "name": "trustmate/magento-extension",
     "description": "A Magento 2 module",
     "type": "magento2-module",
     "license": [

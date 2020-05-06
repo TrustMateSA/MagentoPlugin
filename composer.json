@@ -1,0 +1,15 @@
+{
+    "name": "trustmate/magento-extension",
+    "description": "A Magento 2 module",
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0"
+    ],
+    "require": {
+        "magento/framework": "~100.0.6"
+    },
+    "autoload": {
+        "files": [ "registration.php" ]
+    }
+    
+}

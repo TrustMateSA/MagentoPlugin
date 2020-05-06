@@ -105,7 +105,7 @@ class TrustMateValidationGuest
 
                 if ($this->helper->isProductsOpinionsEnabled()) {
                     foreach ($order->getItems() as $item) {
-                        $invitation['products'][] = array("gtin" => $item->getSku());
+                        $invitation['products'][] = array("local_id" => $item->getSku());
                     }
 
                     $this->api->createInvitation($invitation);

@@ -145,11 +145,11 @@ class DownloadOpinions
             }
 
             foreach ($opinions['items'] as $opinion) {
-                if (!isset($opinion['product']) || !isset($opinion['product']['gtin']) || !isset($opinion['public_identifier'])) {
+                if (!isset($opinion['product']) || (!isset($opinion['product']['gtin']) && !isset($opinion['product']['local_id'])) || !isset($opinion['public_identifier'])) {
                     return;
                 }
 
-                $opinion['product'] = $opinion['product']['gtin'];
+                $opinion['product'] = isset($opinion['product']['gtin']) ? $opinion['product']['gtin'] : $opinion['product']['local_id'];
 
                 try {
                     if ($this->opinionExist($opinion['public_identifier'])) {

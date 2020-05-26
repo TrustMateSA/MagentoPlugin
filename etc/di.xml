@@ -38,11 +38,8 @@
         </arguments>
     </virtualType>
 
-    <type name="Magento\Review\Block\Product\View">
-        <plugin name="trustmate-product-review-list" type="TrustMate\Opinions\Block\Product\View"/>
-    </type>
-
     <preference for="Magento\Review\Block\Product\Review" type="TrustMate\Opinions\Block\Product\Review" />
+    <preference for="Magento\Review\Block\Product\ReviewRenderer" type="TrustMate\Opinions\Block\Product\ReviewRenderer" />
     <preference for="Magento\Review\Block\Product\View\ListView" type="TrustMate\Opinions\Block\Product\View\ListView" />
     <preference for="Magento\CheckoutAgreements\Model\CheckoutAgreementsRepository" type="TrustMate\Opinions\Model\CheckoutAgreementsRepository" />
     <preference for="Magento\CheckoutAgreements\Model\AgreementsConfigProvider" type="TrustMate\Opinions\Model\AgreementsConfigProvider" />

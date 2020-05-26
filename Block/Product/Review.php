@@ -52,6 +52,11 @@ class Review extends ProductReview
     public function getCollectionSize()
     {
         $product = $this->getProduct();
+
+        if (!$product) {
+            return 0;
+        }
+
         $collection = $this->_reviewsColFactory->create()
             ->addStoreFilter($this->_storeManager->getStore()->getId())
             ->addStatusFilter(ModelReview::STATUS_APPROVED)

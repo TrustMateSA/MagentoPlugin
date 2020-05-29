@@ -11,7 +11,6 @@ use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Review\Block\Product\ReviewRenderer as ReviewRendererCore;
-use Magento\Review\Model\Review\Summary;
 use Magento\Review\Model\ReviewFactory;
 use TrustMate\Opinions\Helper\Data;
 
@@ -49,12 +48,11 @@ class ReviewRenderer extends ReviewRendererCore
      */
     public function getRatingSummary()
     {
+        $count = 1;
         $product = $this->getProduct();
+        $summary = $product->getRatingSummary()->getRatingSummary();
 
         if ($this->helper->isProductsOpinionsEnabled() && $product->getTypeId() === Configurable::TYPE_CODE) {
-            $count = 0;
-            $summary = 0;
-
             foreach ($product->getTypeInstance()->getUsedProducts($product) as $simpleProduct) {
                 $simpleRating = $this->getProductRatingSummary($simpleProduct)->getRatingSummary();
 
@@ -63,31 +61,26 @@ class ReviewRenderer extends ReviewRendererCore
                     $count ++;
                 }
             }
-
-            return $summary / $count;
         }
 
-        return $product->getRatingSummary()->getRatingSummary();
+        return $summary / $count;
     }
 
     /**
-     * @inheritdoct
+     * @inheritdoc
      */
     public function getReviewsCount()
     {
+        $count = $this->getProduct()->getRatingSummary()->getReviewsCount();
         $product = $this->getProduct();
 
         if ($this->helper->isProductsOpinionsEnabled() && $product->getTypeId() === Configurable::TYPE_CODE) {
-            $count = 0;
-
             foreach ($product->getTypeInstance()->getUsedProducts($product) as $simpleProduct) {
                 $count += $this->getProductRatingSummary($simpleProduct)->getReviewsCount();
             }
-
-            return $count;
         }
 
-        return $this->getProduct()->getRatingSummary()->getReviewsCount();
+        return $count;
     }
 
 

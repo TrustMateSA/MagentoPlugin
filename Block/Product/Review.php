@@ -67,8 +67,9 @@ class Review extends ProductReview
             $collection->addEntityFilter('product', $product->getId());
         } else {
             if ($product->getTypeId() === Configurable::TYPE_CODE) {
-                $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId());
-                $collection->addFieldToFilter('entity_pk_value', array('in' => $childrenIds));
+                $products = $product->getTypeInstance()->getChildrenIds($product->getId());
+                $products[] = $product->getId();
+                $collection->addFieldToFilter('entity_pk_value', array('in' => $products));
             } else {
                 $collection->addEntityFilter('product', $product->getId());
             }

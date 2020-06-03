@@ -4,9 +4,10 @@
  * @copyright 2019 TrustMate
  */
 
-
 namespace TrustMate\Opinions\Block\Product;
 
+use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Review\Model\ResourceModel\Review\CollectionFactory;
@@ -50,17 +51,41 @@ class Review extends ProductReview
      */
     public function getCollectionSize()
     {
-        $collection = $this->_reviewsColFactory->create()->addStoreFilter(
-            $this->_storeManager->getStore()->getId()
-        )->addStatusFilter(ModelReview::STATUS_APPROVED)->addEntityFilter(
-            'product',
-            $this->getProductId()
-        );
+        $product = $this->getProduct();
+
+        if (!$product) {
+            return 0;
+        }
+
+        $collection = $this->_reviewsColFactory->create()
+            ->addStoreFilter($this->_storeManager->getStore()->getId())
+            ->addStatusFilter(ModelReview::STATUS_APPROVED)
+        ;
 
         if (!$this->helper->isProductsOpinionsEnabled()) {
             $collection->addFieldToFilter('title', array('neq' => Data::OPINION_TITLE));
+            $collection->addEntityFilter('product', $product->getId());
+        } else {
+            if ($product->getTypeId() === Configurable::TYPE_CODE) {
+                $products = $product->getTypeInstance()->getChildrenIds($product->getId());
+                $products[] = $product->getId();
+                $collection->addFieldToFilter('entity_pk_value', array('in' => $products));
+            } else {
+                $collection->addEntityFilter('product', $product->getId());
+            }
         }
 
         return $collection->getSize();
+    }
+
+    /**
+     * Get current product
+     *
+     * @return null|Product
+     */
+    public function getProduct()
+    {
+        $product = $this->_coreRegistry->registry('product');
+        return $product ?: null;
     }
 }

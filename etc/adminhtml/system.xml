@@ -49,6 +49,11 @@
                     <label>API Key</label>
                     <comment>Enter your API Key</comment>
                 </field>
+                <field id="store_id" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Store ID</label>
+                    <comment>Enter store ID for which you want to display opinions.</comment>
+                    <validate>required-entry</validate>
+                </field>
             </group>
         </section>
     </system>

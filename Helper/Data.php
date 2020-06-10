@@ -27,6 +27,7 @@ class Data extends AbstractHelper
     const XML_PATH_WIDGET_ENABLED = 'trustmate_opinions_section/general/widget_enabled';
     const XML_PATH_SHOP_OPINIONS_LOCATION = 'trustmate_opinions_section/general/shop_widget_location';
     const XML_PATH_PRODUCTS_OPINIONS_ENABLED = 'trustmate_opinions_section/general/products_opinions_enabled';
+    const XML_STORE_ID = 'trustmate_opinions_section/general/store_id';
 
     /**
      * @return bool
@@ -90,5 +91,13 @@ class Data extends AbstractHelper
     public function getWidgetLink()
     {
         return $this->getUuid() ? static::WIDGET_LINK . $this->getUuid() : false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOpinionsStoreId()
+    {
+        return $this->scopeConfig->getValue(static::XML_STORE_ID, static::SCOPE_STORE);
     }
 }

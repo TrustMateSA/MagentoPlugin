@@ -4,7 +4,6 @@
  * @copyright 2019 TrustMate
  */
 
-
 namespace TrustMate\Opinions\Block\Product;
 
 use Magento\Catalog\Model\Product;
@@ -48,11 +47,16 @@ class ReviewRenderer extends ReviewRendererCore
      */
     public function getRatingSummary()
     {
+        $summary = parent::getRatingSummary();
+
+        if (!$this->helper->isProductsOpinionsEnabled()) {
+            return $summary;
+        }
+
         $count = 1;
         $product = $this->getProduct();
-        $summary = $product->getRatingSummary()->getRatingSummary();
 
-        if ($this->helper->isProductsOpinionsEnabled() && $product->getTypeId() === Configurable::TYPE_CODE) {
+        if ($product->getTypeId() === Configurable::TYPE_CODE) {
             foreach ($product->getTypeInstance()->getUsedProducts($product) as $simpleProduct) {
                 $simpleRating = $this->getProductRatingSummary($simpleProduct)->getRatingSummary();
 
@@ -71,7 +75,7 @@ class ReviewRenderer extends ReviewRendererCore
      */
     public function getReviewsCount()
     {
-        $count = $this->getProduct()->getRatingSummary()->getReviewsCount();
+        $count = parent::getReviewsCount();
         $product = $this->getProduct();
 
         if ($this->helper->isProductsOpinionsEnabled() && $product->getTypeId() === Configurable::TYPE_CODE) {

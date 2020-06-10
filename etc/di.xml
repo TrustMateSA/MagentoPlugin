@@ -23,20 +23,20 @@
         <plugin name="validate-trustmate-agreement" type="TrustMate\Opinions\Model\Checkout\Plugin\TrustMateValidation"/>
     </type>
 
-    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
-        <arguments>
-            <argument name="collections" xsi:type="array">
-                <item name="opinions_grid_listing_data_source" xsi:type="string">TrustMate\Opinions\Model\ResourceModel\ProductOpinions\Collection</item>
-            </argument>
-        </arguments>
-    </type>
-
-    <virtualType name="TrustMate\Opinions\Model\ResourceModel\ProductOpinions\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+    <virtualType name="TrustMateOpinionsGrid" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
             <argument name="mainTable" xsi:type="string">trustmate_product_opinions</argument>
             <argument name="resourceModel" xsi:type="string">TrustMate\Opinions\Model\ResourceModel\ProductOpinions</argument>
         </arguments>
     </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="opinions_grid_listing_data_source" xsi:type="string">TrustMateOpinionsGrid</item>
+            </argument>
+        </arguments>
+    </type>
 
     <preference for="Magento\Review\Block\Product\Review" type="TrustMate\Opinions\Block\Product\Review" />
     <preference for="Magento\Review\Block\Product\ReviewRenderer" type="TrustMate\Opinions\Block\Product\ReviewRenderer" />

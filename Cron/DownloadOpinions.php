@@ -145,8 +145,10 @@ class DownloadOpinions
             }
 
             foreach ($opinions['items'] as $opinion) {
-                if (!isset($opinion['product']) || !isset($opinion['product']['local_id']) || !isset($opinion['public_identifier'])) {
-                    return;
+                if (!isset($opinion['product']) || !isset($opinion['product']['local_id'])
+                    || !isset($opinion['public_identifier']) || !isset($opinion['body'])
+                ) {
+                    continue;
                 }
 
                 $opinion['product'] = $opinion['product']['local_id'];
@@ -186,6 +188,10 @@ class DownloadOpinions
      * @return array
      */
     private function getStores() {
+        if ($id = $this->helper->getOpinionsStoreId()) {
+            return [$id];
+        }
+
         $stores = $this->storeManager->getStores();
         $ids = array();
 
@@ -225,7 +231,6 @@ class DownloadOpinions
      * @param $productId
      * @param $stores
      * @param $storeId
-     * @throws LocalizedException
      */
     private function saveMagentoOpinion($data, $productId, $stores, $storeId) {
         $review = $this->reviewFactory->create()->setData($data);
@@ -246,7 +251,6 @@ class DownloadOpinions
      * @param array $data
      * @param $productId
      * @param $review
-     * @throws LocalizedException
      */
     private function saveRating($data, $productId, $review) {
         $trustmateRating = $this->ratingFactory->create()

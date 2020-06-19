@@ -123,7 +123,6 @@ class UpgradeData implements UpgradeDataInterface
      */
     public function addTrustMateRating()
     {
-        $this->appState->setAreaCode(Area::AREA_ADMINHTML);
         $rating = $this->rating->create();
 
         $rating->setRatingCode(Data::TRUSTMATE_CODE)

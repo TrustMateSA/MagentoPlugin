@@ -135,7 +135,7 @@ class Data extends AbstractHelper
             ];
         }
 
-        if ($isFromApp = $order->getData('is_from_app')) {
+        if ($order->getData('is_from_app')) {
             $invitation['metadata'][] = [
                 'name'  => 'is_from_app',
                 'value' => 'Yes'

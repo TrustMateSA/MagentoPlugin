@@ -6,6 +6,7 @@
 
 namespace TrustMate\Opinions\Model\Checkout\Plugin;
 
+use Closure;
 use Magento\Checkout\Model\PaymentInformationManagement;
 use Magento\CheckoutAgreements\Model\ResourceModel\Agreement\CollectionFactory as AgreementCollectionFactory;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -16,6 +17,7 @@ use TrustMate\Opinions\Model\Api\Api;
 
 /**
  * Class TrustMateValidation
+ *
  * @package TrustMate\Opinions\Model\Checkout\Plugin
  */
 class TrustMateValidation
@@ -57,22 +59,23 @@ class TrustMateValidation
         Data $helper
     ) {
         $this->collectionFactory = $collectionFactory;
-        $this->api = $api;
-        $this->orderRepository = $orderRepository;
-        $this->helper = $helper;
+        $this->api               = $api;
+        $this->orderRepository   = $orderRepository;
+        $this->helper            = $helper;
     }
 
     /**
      * @param PaymentInformationManagement $subject
-     * @param \Closure                     $proceed
+     * @param Closure                      $proceed
      * @param                              $cartId
      * @param PaymentInterface             $paymentMethod
      * @param AddressInterface|null        $billingAddress
+     *
      * @return mixed
      */
     public function aroundSavePaymentInformationAndPlaceOrder(
         PaymentInformationManagement $subject,
-        \Closure $proceed,
+        Closure $proceed,
         $cartId,
         PaymentInterface $paymentMethod,
         AddressInterface $billingAddress = null
@@ -80,21 +83,24 @@ class TrustMateValidation
         $orderId = $proceed($cartId, $paymentMethod, $billingAddress);
 
         if ($this->helper->isShopOpinionsEnabled() || $this->helper->isProductsOpinionsEnabled()) {
-            $agreements = $paymentMethod->getExtensionAttributes() === null ? array() : $paymentMethod->getExtensionAttributes()->getAgreementIds();
+            $agreements = $paymentMethod->getExtensionAttributes() === null ? [] :
+                $paymentMethod->getExtensionAttributes()->getAgreementIds();
             $agreementsList = $this->collectionFactory->create()
                 ->addFieldToFilter('is_active', 1)
                 ->addFieldToFilter('name', Data::TRUSTMATE_CODE);
             $trustMateAgreementId = $agreementsList->getFirstItem()->getId();
             $collectAgreementsWithTrustMate = $this->helper->collectAgreementsWithTrustMate();
 
-            if (!$collectAgreementsWithTrustMate || ($collectAgreementsWithTrustMate && in_array($trustMateAgreementId, $agreements))) {
+            if (!$collectAgreementsWithTrustMate || in_array($trustMateAgreementId, $agreements)) {
                 $order = $this->orderRepository->get($orderId);
 
-                $invitation = array(
-                    "send_to" => $order->getCustomerEmail(),
+                $invitation = [
+                    "send_to"       => $order->getCustomerEmail(),
                     "customer_name" => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
-                    "order_number" => $orderId
-                );
+                    "order_number"  => $order->getIncrementId(),
+                ];
+
+                $invitation = $this->helper->addMetadata($order, $invitation, 'Yes');
 
                 if ($this->helper->isShopOpinionsEnabled()) {
                     $this->api->createInvitation($invitation);
@@ -102,7 +108,7 @@ class TrustMateValidation
 
                 if ($this->helper->isProductsOpinionsEnabled()) {
                     foreach ($order->getItems() as $item) {
-                        $invitation['products'][] = array("local_id" => $item->getSku());
+                        $invitation['products'][] = ["local_id" => $item->getSku()];
                     }
 
                     $this->api->createInvitation($invitation);

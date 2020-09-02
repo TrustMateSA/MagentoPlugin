@@ -96,7 +96,7 @@ class TrustMateValidation
 
                 $invitation = [
                     "send_to"       => $order->getCustomerEmail(),
-                    "customer_name" => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
+                    "customer_name" => $order->getCustomerFirstname(),
                     "order_number"  => $order->getIncrementId(),
                 ];
 

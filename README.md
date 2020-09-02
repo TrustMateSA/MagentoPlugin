@@ -14,6 +14,9 @@
 
 #### Change log
 
-##### 1.0.4
+##### 1.0.4 (05.08.2020)
 - Dodanie metadata
 - Zmiana order_id na increment_id
+
+##### 1.0.5 (02.09.2020)
+- Usunięcie nazwiska z zaproszeń w polu customer_name

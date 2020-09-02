@@ -98,7 +98,7 @@ class TrustMateValidationGuest
                 $shipping   = $order->getShippingAddress();
                 $invitation = [
                     "send_to"       => $order->getCustomerEmail(),
-                    "customer_name" => $shipping->getFirstname() . ' ' . $shipping->getLastname(),
+                    "customer_name" => $shipping->getFirstname(),
                     "order_number"  => $order->getIncrementId()
                 ];
 

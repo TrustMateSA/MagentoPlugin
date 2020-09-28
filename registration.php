@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright © 2019 TrustMate. All rights reserved.
+ * Copyright © 2020 TrustMate. All rights reserved.
  * TrustMate Opinions Module
  */
 

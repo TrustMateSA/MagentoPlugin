@@ -1,15 +1,12 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2020 TrustMate
  */
 
 namespace TrustMate\Opinions\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
@@ -103,60 +100,5 @@ class Data extends AbstractHelper
     public function getOpinionsStoreId()
     {
         return $this->scopeConfig->getValue(static::XML_STORE_ID, static::SCOPE_STORE);
-    }
-
-    /**
-     * @param OrderInterface $order
-     * @param array          $invitation
-     * @param string         $logged
-     *
-     * @return array
-     */
-    public function addMetadata(OrderInterface $order, array $invitation, string $logged)
-    {
-        $invitation["metadata"] = [
-            [
-                'name'  => 'is_logged_in',
-                'value' => $logged
-            ]
-        ];
-
-        if ($payment = $order->getPayment()) {
-            $invitation['metadata'][] = [
-                'name'  => 'payment_method',
-                'value' => $payment->getMethodInstance()->getTitle()
-            ];
-        }
-
-        if ($shipping = $order->getShippingDescription()) {
-            $invitation['metadata'][] = [
-                'name'  => 'shipping_method',
-                'value' => $shipping
-            ];
-        }
-
-        if ($order->getData('is_from_app')) {
-            $invitation['metadata'][] = [
-                'name'  => 'is_from_app',
-                'value' => 'Yes'
-            ];
-        }
-
-
-        if (($shops = $order->getData('shops')) &&
-            class_exists(\Otcf\App\Service\StoreLocator\ShopRepository::class)) {
-            try {
-                $stationaryShopRepository = ObjectManager::getInstance()->get(\Otcf\App\Service\StoreLocator\ShopRepository::class);
-                $stationaryShop = $stationaryShopRepository->getByWmsId($shops);
-
-                $invitation['metadata'][] = [
-                    'name'  => 'shop',
-                    'value' => $stationaryShop->getName()
-                ];
-            } catch (NoSuchEntityException $exception) {
-            }
-        }
-
-        return $invitation;
     }
 }

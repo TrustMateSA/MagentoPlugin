@@ -52,7 +52,7 @@ class TrustMateValidation
         AddressInterface $billingAddress = null
     ) {
         $orderId = $proceed($cartId, $paymentMethod, $billingAddress);
-        $this->helperInvitation->create($paymentMethod, $orderId, true);
+        $this->helperInvitation->proceedCheckoutInvitation($orderId, $paymentMethod);
 
         return $orderId;
     }

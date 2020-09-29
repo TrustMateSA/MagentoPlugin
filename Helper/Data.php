@@ -29,6 +29,7 @@ class Data extends AbstractHelper
     const XML_PATH_SHOP_OPINIONS_LOCATION            = 'trustmate_opinions_section/general/shop_widget_location';
     const XML_PATH_PRODUCTS_OPINIONS_ENABLED         = 'trustmate_opinions_section/general/products_opinions_enabled';
     const XML_STORE_ID                               = 'trustmate_opinions_section/general/store_id';
+    const XML_CREATE_INVITATION_EVENT                = 'trustmate_opinions_section/general/invitation_event';
 
     /**
      * @return bool
@@ -100,5 +101,13 @@ class Data extends AbstractHelper
     public function getOpinionsStoreId()
     {
         return $this->scopeConfig->getValue(static::XML_STORE_ID, static::SCOPE_STORE);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreateInvitationEvent()
+    {
+        return $this->scopeConfig->getValue(static::XML_CREATE_INVITATION_EVENT, static::SCOPE_STORE);
     }
 }

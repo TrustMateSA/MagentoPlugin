@@ -2,7 +2,7 @@
 /**
  * @package   TrustMate\Opinions
  * @copyright 2020 TrustMate
- * @since     1.0.6
+ * @since     1.1.0
  */
 
 namespace TrustMate\Opinions\Helper;
@@ -14,6 +14,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use TrustMate\Opinions\Model\Api\Api;
 
 /**
@@ -23,6 +24,9 @@ use TrustMate\Opinions\Model\Api\Api;
  */
 class Invitation extends AbstractHelper
 {
+    const PLACE_ORDER_EVENT     = 'place_order';
+    const CREATE_SHIPMENT_EVENT = 'create_shipment';
+
     /**
      * Collection factory.
      *
@@ -66,31 +70,20 @@ class Invitation extends AbstractHelper
     }
 
     /**
-     * @param PaymentInterface $paymentMethod
-     * @param int              $orderId
-     * @param bool             $logged
+     * @param Order $order
      */
-    public function create(PaymentInterface $paymentMethod, int $orderId, bool $logged = false)
+    public function create(Order $order)
     {
-        if ($this->helper->isShopOpinionsEnabled() || $this->helper->isProductsOpinionsEnabled()) {
-            $agreements = $paymentMethod->getExtensionAttributes() === null ? [] :
-                $paymentMethod->getExtensionAttributes()->getAgreementIds();
-            $trustMateAgreementId = $this->getTrustmateAgreementId();
+        $shipping   = $order->getShippingAddress();
+        $invitation = [
+            "send_to"       => $order->getCustomerEmail(),
+            "customer_name" => $order->getCustomerFirstname() ?: $shipping->getFirstname(),
+            "order_number"  => $order->getIncrementId()
+        ];
+        $invitation = $this->addMetadata($order, $invitation, $this->mapBoolValue((bool) $order->getCustomerId()));
 
-            if (!$this->helper->collectAgreementsWithTrustMate() || in_array($trustMateAgreementId, $agreements)
-            ) {
-                $order      = $this->orderRepository->get($orderId);
-                $shipping   = $order->getShippingAddress();
-                $invitation = [
-                    "send_to"       => $order->getCustomerEmail(),
-                    "customer_name" => $logged ? $order->getCustomerFirstname() : $shipping->getFirstname(),
-                    "order_number"  => $order->getIncrementId()
-                ];
-                $invitation = $this->addMetadata($order, $invitation, $this->mapBoolValue($logged));
+        $this->createInvitations($invitation, $order);
 
-                $this->createInvitation($invitation, $order);
-            }
-        }
     }
 
     /**
@@ -177,7 +170,7 @@ class Invitation extends AbstractHelper
      * @param array          $invitation
      * @param OrderInterface $order
      */
-    public function createInvitation(array $invitation, OrderInterface $order)
+    public function createInvitations(array $invitation, OrderInterface $order)
     {
         if ($this->helper->isShopOpinionsEnabled()) {
             $this->api->createInvitation($invitation);
@@ -189,6 +182,65 @@ class Invitation extends AbstractHelper
             }
 
             $this->api->createInvitation($invitation);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function createInvitationAfterPlaceOrder()
+    {
+        return $this->helper->getCreateInvitationEvent() === static::PLACE_ORDER_EVENT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function createInvitationAfterCreateShipment()
+    {
+        return $this->helper->getCreateInvitationEvent() === static::CREATE_SHIPMENT_EVENT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkInvitationEnabled()
+    {
+        return $this->helper->isShopOpinionsEnabled() || $this->helper->isProductsOpinionsEnabled();
+    }
+
+    /**
+     * @param int              $orderId
+     * @param PaymentInterface $paymentMethod
+     */
+    public function proceedCheckoutInvitation(int $orderId, PaymentInterface $paymentMethod)
+    {
+        if ($this->checkInvitationEnabled()) {
+            $paymentExtAttr       = $paymentMethod->getExtensionAttributes();
+            $agreements           = $paymentExtAttr === null ? [] : $paymentExtAttr->getAgreementIds();
+            $trustMateAgreementId = $this->getTrustmateAgreementId();
+
+            if (!$this->helper->collectAgreementsWithTrustMate() || in_array($trustMateAgreementId, $agreements)) {
+                $order = $this->orderRepository->get($orderId);
+
+                if ($this->createInvitationAfterPlaceOrder()) {
+                    $this->create($order);
+                } else {
+                    // save TrustMate agreement to proceed invitation after create shipment
+                    $order->setTrustmateAgreement(1);
+                    $this->orderRepository->save($order);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param Order $order
+     */
+    public function proceedOrderShipmentInvitation(Order $order)
+    {
+        if ($order->getTrustmateAgreement()) {
+            $this->create($order);
         }
     }
 }

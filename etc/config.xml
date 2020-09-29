@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!--
+ @package  Fwc\PayPo
+ @author Leszek Kruk <leszek.kruk@fastwhitecat.com>
+ @copyright 2018 Fast White Cat S. A.
+ @license See LICENSE_FASTWHITECAT.txt for license details.
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <trustmate_opinions_section>
+            <general>
+                <invitation_event>create_shipment</invitation_event>
+            </general>
+        </trustmate_opinions_section>
+    </default>
+</config>

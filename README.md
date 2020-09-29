@@ -23,6 +23,7 @@
 ##### 1.0.5 (02.09.2020)
 - Usunięcie nazwiska z zaproszeń w polu customer_name
 
-##### 1.0.6 (29.09.2020)
+##### 1.1.0 (29.09.2020)
 - Przeniesienie logiki tworzenia zaproszeń
+- Zapisywanie zgody w tabeli sales_order
 - Dodanie możliwości zmiany momentu wysyłania zaproszeń (Po złożeniu zamówienia / Po utworzeniu wysyłki)

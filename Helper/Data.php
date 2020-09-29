@@ -1,15 +1,12 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2020 TrustMate
  */
 
 namespace TrustMate\Opinions\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
@@ -32,6 +29,7 @@ class Data extends AbstractHelper
     const XML_PATH_SHOP_OPINIONS_LOCATION            = 'trustmate_opinions_section/general/shop_widget_location';
     const XML_PATH_PRODUCTS_OPINIONS_ENABLED         = 'trustmate_opinions_section/general/products_opinions_enabled';
     const XML_STORE_ID                               = 'trustmate_opinions_section/general/store_id';
+    const XML_CREATE_INVITATION_EVENT                = 'trustmate_opinions_section/general/invitation_event';
 
     /**
      * @return bool
@@ -106,57 +104,10 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param OrderInterface $order
-     * @param array          $invitation
-     * @param string         $logged
-     *
-     * @return array
+     * @return mixed
      */
-    public function addMetadata(OrderInterface $order, array $invitation, string $logged)
+    public function getCreateInvitationEvent()
     {
-        $invitation["metadata"] = [
-            [
-                'name'  => 'is_logged_in',
-                'value' => $logged
-            ]
-        ];
-
-        if ($payment = $order->getPayment()) {
-            $invitation['metadata'][] = [
-                'name'  => 'payment_method',
-                'value' => $payment->getMethodInstance()->getTitle()
-            ];
-        }
-
-        if ($shipping = $order->getShippingDescription()) {
-            $invitation['metadata'][] = [
-                'name'  => 'shipping_method',
-                'value' => $shipping
-            ];
-        }
-
-        if ($order->getData('is_from_app')) {
-            $invitation['metadata'][] = [
-                'name'  => 'is_from_app',
-                'value' => 'Yes'
-            ];
-        }
-
-
-        if (($shops = $order->getData('shops')) &&
-            class_exists(\Otcf\App\Service\StoreLocator\ShopRepository::class)) {
-            try {
-                $stationaryShopRepository = ObjectManager::getInstance()->get(\Otcf\App\Service\StoreLocator\ShopRepository::class);
-                $stationaryShop = $stationaryShopRepository->getByWmsId($shops);
-
-                $invitation['metadata'][] = [
-                    'name'  => 'shop',
-                    'value' => $stationaryShop->getName()
-                ];
-            } catch (NoSuchEntityException $exception) {
-            }
-        }
-
-        return $invitation;
+        return $this->scopeConfig->getValue(static::XML_CREATE_INVITATION_EVENT, static::SCOPE_STORE);
     }
 }

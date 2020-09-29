@@ -2,17 +2,19 @@
 /**
  * @package   TrustMate\Opinions
  * @copyright 2020 TrustMate
+ * @since     1.1.0
  */
 
 namespace TrustMate\Opinions\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
+use TrustMate\Opinions\Helper\Invitation;
 
 /**
- * Class Location
+ * Class InvitationEvent
  * @package TrustMate
  */
-class Location implements ArrayInterface
+class InvitationEvent implements ArrayInterface
 {
     /**
      * Options getter
@@ -40,17 +42,9 @@ class Location implements ArrayInterface
      */
     public function toArray()
     {
-        $status = array(
-            'top-left' => __('Left Top (1)'),
-            'left-m' => __('Left Middle (2)'),
-            'bottom-left' => __('Left Bottom (3)'),
-            'top-m' => __('Middle Top (4)'),
-            'bottom-m' => __('Middle Bottom (5)'),
-            'top-right' => __('Right Top (6)'),
-            'right-m' => __('Right Middle (7)'),
-            'bottom-right' => __('Right Bottom (8)')
-        );
-
-        return $status;
+        return [
+            Invitation::PLACE_ORDER_EVENT => __('After place order'),
+            Invitation::CREATE_SHIPMENT_EVENT => __('After create shipment')
+        ];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2020 TrustMate
  */
 
 namespace TrustMate\Opinions\Cron;
@@ -178,8 +178,6 @@ class DownloadOpinions
                     $this->logger->critical($e->getMessage());
                     continue;
                 };
-
-
             }
         } while (isset($opinions['pages']) && $page++ < $opinions['pages']);
     }
@@ -244,7 +242,6 @@ class DownloadOpinions
         if ($review->getEntityId()) {
             $this->saveRating($data, $productId, $review);
         }
-
     }
 
     /**

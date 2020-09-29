@@ -1,7 +1,7 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2020 TrustMate
  */
 
 namespace TrustMate\Opinions\Model\ResourceModel\ProductOpinions;

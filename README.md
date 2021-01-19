@@ -1,13 +1,15 @@
-# Instalacja wtyczki:
+# Plugin installation:
 
-## 1. Rozpakuj pobrane archiwum i jego zawartość przenieś do katalogu app/code
+## 1. Unpack downloaded archive and move contents do app/code directory
 
-## 2. Z poziomu konsoli uruchom kolejno polecenia: 
+## 2. From the CLU run: 
   * php bin/magento module:enable TrustMate_Opinions
   * php bin/magento setup:upgrade
   * php bin/magento setup:di:compile
   * php bin/magento setup:static-content:deploy pl_PL en_US 
-## 3. Po zalogowaniu do panelu Magento wybierz opcję TrustMate->Ustawienia gdzie możesz skonfigurować wtyczkę wg zawartej tam instrukcji
-## 4. Po skonfigurowaniu wtyczki wyczyść cache magento 
-(System->Narzędzia->Pamięć podręczna->Wyczyść pamięć podręczną Magento) lub poprzez polecenie w konsoli
+## 3. After logging in to Magento panel, choose TrustMate → Settings and configure it following given instructions.
+
+## 4. After proper plugin configuration - clear Magento cache
+System → Tools → Cache Management → Flush Magento Cache)
+or using CLI:
   * php bin/magento cache:flush

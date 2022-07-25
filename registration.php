@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Copyright © 2019 TrustMate. All rights reserved.
- * TrustMate Opinions Module
+ * Copyright © 2020 TrustMate. All rights reserved.
+ * TrustMate reviews module
  */
 
 use Magento\Framework\Component\ComponentRegistrar;

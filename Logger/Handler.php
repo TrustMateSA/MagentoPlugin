@@ -1,8 +1,10 @@
 <?php
 /**
- * @package TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @package   TrustMate\Opinions
+ * @copyright 2022 TrustMate
  */
+
+declare(strict_types=1);
 
 namespace TrustMate\Opinions\Logger;
 

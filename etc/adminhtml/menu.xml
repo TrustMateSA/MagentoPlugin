@@ -7,7 +7,7 @@
              resource="TrustMate_Opinions::menu"
         />
         <add id="TrustMate_Opinions::opinions"
-             title="Products Opinion"
+             title="Product reviews"
              module="TrustMate_Opinions"
              sortOrder="10"
              translate="title"

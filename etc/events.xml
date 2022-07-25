@@ -9,4 +9,10 @@
     <event name="admin_system_config_changed_section_trustmate_opinions_section">
         <observer name="trustmate_opinions" instance="TrustMate\Opinions\Observer\UpdateOpinionsObserver"/>
     </event>
+    <event name='review_review_collection_load_before'>
+        <observer name='trustmate_before_review_collection' instance='TrustMate\Opinions\Observer\Review\Collection'/>
+    </event>
+    <event name='checkout_submit_all_after'>
+        <observer name='trustmate_checkout_submit_all_after' instance='TrustMate\Opinions\Observer\Checkout\Submit'/>
+    </event>
 </config>

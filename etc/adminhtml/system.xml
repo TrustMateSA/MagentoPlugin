@@ -5,54 +5,47 @@
             <label>TrustMate</label>
         </tab>
         <section id="trustmate_opinions_section" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Opinions</label>
+            <label>Reviews</label>
             <tab>trustmate</tab>
             <resource>TrustMate_Opinions::settings</resource>
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General settings</label>
                 <field id="instruction" translate="label comment" type="note" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <comment><![CDATA[How to start? <br /><ol class='trustmate trustmate_instructions'><li><small>You must have an account at TrustMate. If you don't have an account - <a href='https://trustmate.io/panel/zarejestruj'>register</a>. </small></li><li><small>To link the TrustMate account to the Magento feedback module, paste your individual code from the TrustMate panel into the UUID field below. (Where can I find the code? TrustMate panel—> Integrations—> copy UUID)</small></li><li><small>After pasting the code and configuring the settings, save the changes. Opinions will begin to accumulate soon! Good luck.</small></li></ul>]]></comment>
+                    <comment><![CDATA[How to start? <br /><ol class='trustmate trustmate_instructions'><li><small>You must have an account at TrustMate. If you don't have an account - <a href='https://trustmate.io/register'>register</a>. </small></li><li><small>To link the TrustMate account to the Magento feedback module, paste your API key from the TrustMate panel - integrations page.</small></li></ol>]]></comment>
                 </field>
                 <field id="module_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Shop opinions enabled</label>
+                    <label>Shop reviews enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="uuid" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>UUID</label>
-                    <comment>Where can I find the code? TrustMate panel—> Integrations—> copy UUID</comment>
-                </field>
-                <field id="collect_agreements_with_trustmate" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Send "add opinion" emails to customers</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>If TrustMate consent collection is disabled, invitations will be sent to each client. This means that You must collect consent from customers yourself.</comment>
-                </field>
-                <field id="widget_enabled" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Widget enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="shop_widget_location" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Location of shop evaluation widget</label>
-                    <depends>
-                        <field id="widget_enabled">1</field>
-                    </depends>
-                    <source_model>TrustMate\Opinions\Model\Config\Source\Location</source_model>
-                    <comment>
-                        <![CDATA[The widget will be displayed on all subpages in the form of a drop-down button.<div class='trustmate trustmate_widget_location' />]]>
-                    </comment>
                 </field>
                 <field id="products_opinions_enabled" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Products opinions enabled</label>
+                    <label>Product reviews enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>If You want to collect additional product reviews, enable the product reviews module and enter your API key ( available in the TrustMate panel section integration or by contacting support@trustmate.io). In addition, in the TrustMate panel You need to create a configuration of product invitations and mark it as automatic, as well as enter the Google Products or Ceneo product feed address in the settings.</comment>
+                    <comment>Shop and product reviews require corresponding invitation configurations marked as automatic in TrustMate panel (enabled by default)</comment>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="invitation_event" translate="label" type="select" sortOrder="75" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Create invitation event</label>
+                    <source_model>TrustMate\Opinions\Model\Config\Source\InvitationEvent</source_model>
+                    <comment>Select the event when the invitation should be sent</comment>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="api_key" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>API Key</label>
-                    <comment>Enter your API Key</comment>
-                </field>
-                <field id="store_id" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Store ID</label>
-                    <comment>Enter store ID for which you want to display opinions.</comment>
                     <validate>required-entry</validate>
+                    <label>API Key</label>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sandbox_mode" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox mode enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
                 </field>
             </group>
         </section>

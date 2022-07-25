@@ -1,0 +1,33 @@
+{
+    "trustmate_product_opinions": {
+        "column": {
+            "id": true,
+            "created_at": true,
+            "updated_at": true,
+            "grade": true,
+            "author_email": true,
+            "author_name": true,
+            "product": true,
+            "body": true,
+            "public_identifier": true,
+            "language": true,
+            "original_body": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "review": {
+        "column": {
+            "trustmate_review_id": true
+        },
+        "index": {
+            "REVIEW_TRUSTMATE_REVIEW_ID": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "trustmate_agreement": true
+        }
+    }
+}

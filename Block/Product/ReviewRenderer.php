@@ -1,17 +1,20 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2022 TrustMate
  */
+
+declare(strict_types=1);
 
 namespace TrustMate\Opinions\Block\Product;
 
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Review\Block\Product\ReviewRenderer as ReviewRendererCore;
 use Magento\Review\Model\ReviewFactory;
-use TrustMate\Opinions\Helper\Data;
+use TrustMate\Opinions\Model\Config\Data;
 
 /**
  * Class ReviewRenderer
@@ -49,7 +52,7 @@ class ReviewRenderer extends ReviewRendererCore
     {
         $summary = parent::getRatingSummary();
 
-        if (!$this->helper->isProductsOpinionsEnabled()) {
+        if (!$this->helper->isProductOpinionEnabled()) {
             return $summary;
         }
 
@@ -78,7 +81,7 @@ class ReviewRenderer extends ReviewRendererCore
         $count = parent::getReviewsCount();
         $product = $this->getProduct();
 
-        if ($this->helper->isProductsOpinionsEnabled() && $product->getTypeId() === Configurable::TYPE_CODE) {
+        if ($this->helper->isProductOpinionEnabled() && $product->getTypeId() === Configurable::TYPE_CODE) {
             foreach ($product->getTypeInstance()->getUsedProducts($product) as $simpleProduct) {
                 $count += $this->getProductRatingSummary($simpleProduct)->getReviewsCount();
             }
@@ -92,6 +95,7 @@ class ReviewRenderer extends ReviewRendererCore
      * @param Product $product
      *
      * @return mixed
+     * @throws NoSuchEntityException
      */
     public function getProductRatingSummary(Product $product)
     {

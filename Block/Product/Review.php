@@ -1,8 +1,10 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2022 TrustMate
  */
+
+declare(strict_types=1);
 
 namespace TrustMate\Opinions\Block\Product;
 
@@ -13,7 +15,7 @@ use Magento\Framework\View\Element\Template\Context;
 use Magento\Review\Model\ResourceModel\Review\CollectionFactory;
 use Magento\Review\Model\Review as ModelReview;
 use Magento\Review\Block\Product\Review as ProductReview;
-use TrustMate\Opinions\Helper\Data;
+use TrustMate\Opinions\Model\Config\Data;
 
 /**
  * Class Shop
@@ -28,6 +30,7 @@ class Review extends ProductReview
 
     /**
      * Review constructor.
+     *
      * @param Context           $context
      * @param Registry          $registry
      * @param CollectionFactory $collectionFactory
@@ -49,7 +52,7 @@ class Review extends ProductReview
     /**
      * @inheritdoc
      */
-    public function getCollectionSize()
+    public function getCollectionSize(): int
     {
         $product = $this->getProduct();
 
@@ -62,8 +65,8 @@ class Review extends ProductReview
             ->addStatusFilter(ModelReview::STATUS_APPROVED)
         ;
 
-        if (!$this->helper->isProductsOpinionsEnabled()) {
-            $collection->addFieldToFilter('title', array('neq' => Data::OPINION_TITLE));
+        if (!$this->helper->isProductOpinionEnabled()) {
+            $collection->addFieldToFilter('title', array('neq' => 'Opinia z TrustMate'));
             $collection->addEntityFilter('product', $product->getId());
         } else {
             if ($product->getTypeId() === Configurable::TYPE_CODE) {
@@ -83,7 +86,7 @@ class Review extends ProductReview
      *
      * @return null|Product
      */
-    public function getProduct()
+    public function getProduct(): ?Product
     {
         $product = $this->_coreRegistry->registry('product');
         return $product ?: null;

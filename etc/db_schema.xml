@@ -1,0 +1,30 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="trustmate_product_opinions" resource="default" engine="innodb"
+           comment="TrustMate Product Opinions">
+        <column xsi:type="int" name="id" unsigned="false" nullable="false" identity="true" comment="Opinion ID"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created at"/>
+        <column xsi:type="datetime" name="updated_at" nullable="false" comment="Updated at"/>
+        <column xsi:type="smallint" name="grade" nullable="false" comment="Opinion Grade"/>
+        <column xsi:type="text" name="author_email" nullable="false" comment="Author Email"/>
+        <column xsi:type="text" name="author_name" nullable="false" comment="Author Name"/>
+        <column xsi:type="text" name="product" nullable="false" comment="Product SKU"/>
+        <column xsi:type="text" name="body" nullable="true" comment="Opinion text"/>
+        <column xsi:type="text" name="public_identifier" nullable="false" comment="Public Identifier"/>
+        <column xsi:type="text" name="language" nullable="false" comment="Review Language"/>
+        <column xsi:type="text" name="original_body" nullable="true" comment="Original Body"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="review">
+        <column xsi:type="smallint" name="trustmate_review_id" unsigned="true" nullable="true" identity="false"
+                default="0" comment="Trustmate Review ID"/>
+        <index referenceId="REVIEW_TRUSTMATE_REVIEW_ID" indexType="btree">
+            <column name="trustmate_review_id"/>
+        </index>
+    </table>
+    <table name="sales_order" resource="default">
+        <column xsi:type="boolean" name="trustmate_agreement" nullable="true" comment="Order has TrustMate agreement"/>
+    </table>
+</schema>

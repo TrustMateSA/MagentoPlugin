@@ -1,8 +1,10 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2022 TrustMate
  */
+
+declare(strict_types=1);
 
 namespace TrustMate\Opinions\Observer;
 
@@ -11,7 +13,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Review\Model\ResourceModel\Review\CollectionFactory;
 use Magento\Review\Model\Review;
 use Magento\Review\Model\ReviewFactory;
-use TrustMate\Opinions\Helper\Data;
+use TrustMate\Opinions\Model\Config\Data;
 use TrustMate\Opinions\Logger\Logger;
 
 /**
@@ -44,21 +46,21 @@ class UpdateOpinionsObserver implements ObserverInterface
     /**
      * UpdateOpinionsObserver constructor.
      *
-     * @param Data              $helper
+     * @param Data $helper
      * @param CollectionFactory $collectionFactory
-     * @param ReviewFactory     $reviewFactory
-     * @param Logger            $logger
+     * @param ReviewFactory $reviewFactory
+     * @param Logger $logger
      */
     public function __construct(
-        Data $helper,
+        Data              $helper,
         CollectionFactory $collectionFactory,
-        ReviewFactory $reviewFactory,
-        Logger $logger
+        ReviewFactory     $reviewFactory,
+        Logger            $logger
     ) {
-        $this->helper            = $helper;
+        $this->helper = $helper;
         $this->collectionFactory = $collectionFactory;
-        $this->reviewFactory     = $reviewFactory;
-        $this->logger            = $logger;
+        $this->reviewFactory = $reviewFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -70,10 +72,10 @@ class UpdateOpinionsObserver implements ObserverInterface
     {
         $productIds = [];
         $reviewsToAggregate = [];
-        $enabled = $this->helper->isProductsOpinionsEnabled();
+        $enabled = $this->helper->isProductOpinionEnabled();
         $collection = $this->collectionFactory->create()
-            ->addStoreFilter($this->helper->getOpinionsStoreId())
-            ->addFieldToFilter('title', Data::OPINION_TITLE);
+            ->addStoreFilter($this->helper->getStoreId())
+            ->addFieldToFilter('title', 'Opinia z TrustMate');
 
         if ($enabled) {
             $collection->addStatusFilter(Review::STATUS_NOT_APPROVED);
@@ -89,7 +91,7 @@ class UpdateOpinionsObserver implements ObserverInterface
                 $review->setStatusId($newStatus)->save();
 
                 if (!in_array($review->getEntityPkValue(), $productIds)) {
-                    $productIds[]         = $review->getEntityPkValue();
+                    $productIds[] = $review->getEntityPkValue();
                     $reviewsToAggregate[] = $review;
                 }
             } catch (\Exception $e) {

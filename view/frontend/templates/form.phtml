@@ -1,8 +1,9 @@
 <?php
-use TrustMate\Opinions\Helper\Data;
+use TrustMate\Opinions\Model\Config\Data;
 /**
  * @var $block \Magento\Review\Block\Form
  */
+
 ?>
 
 <div class="block review-add">
@@ -21,7 +22,7 @@ use TrustMate\Opinions\Helper\Data;
                             <div class="control">
                                 <div class="nested" id="product-review-table">
                                     <?php foreach ($block->getRatings() as $_rating): ?>
-                                        <?php if ($_rating->getRatingCode() == Data::TRUSTMATE_CODE) continue; ?>
+                                        <?php if ($_rating->getRatingCode() === 'TrustMate') continue; ?>
                                         <div class="field choice review-field-rating">
                                             <label class="label" id="<?php echo $block->escapeHtml($_rating->getRatingCode()) ?>_rating_label"><span><?php echo $block->escapeHtml($_rating->getRatingCode()) ?></span></label>
                                             <div class="control review-control-vote">

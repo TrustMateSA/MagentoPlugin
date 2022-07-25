@@ -1,7 +1,8 @@
 {
     "name": "trustmate/magento-extension",
-    "description": "A Magento 2 module",
+    "description": "A Magento 2 plugin to integrate with TrustMate",
     "type": "magento2-module",
+    "version": "2.0.0",
     "license": [
         "OSL-3.0"
     ],
@@ -11,5 +12,4 @@
     "autoload": {
         "files": [ "registration.php" ]
     }
-    
 }

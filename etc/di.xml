@@ -15,18 +15,10 @@
         </arguments>
     </type>
 
-    <type name="Magento\Checkout\Model\GuestPaymentInformationManagement">
-        <plugin name="validate-trustmate-guest-agreement" type="TrustMate\Opinions\Model\Checkout\Plugin\TrustMateValidationGuest"/>
-    </type>
-
-    <type name="Magento\Checkout\Model\PaymentInformationManagement">
-        <plugin name="validate-trustmate-agreement" type="TrustMate\Opinions\Model\Checkout\Plugin\TrustMateValidation"/>
-    </type>
-
     <virtualType name="TrustMateOpinionsGrid" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
             <argument name="mainTable" xsi:type="string">trustmate_product_opinions</argument>
-            <argument name="resourceModel" xsi:type="string">TrustMate\Opinions\Model\ResourceModel\ProductOpinions</argument>
+            <argument name="resourceModel" xsi:type="string">TrustMate\Opinions\Model\ResourceModel\ProductReview</argument>
         </arguments>
     </virtualType>
 
@@ -41,9 +33,9 @@
     <preference for="Magento\Review\Block\Product\Review" type="TrustMate\Opinions\Block\Product\Review" />
     <preference for="Magento\Review\Block\Product\ReviewRenderer" type="TrustMate\Opinions\Block\Product\ReviewRenderer" />
     <preference for="Magento\Review\Block\Product\View\ListView" type="TrustMate\Opinions\Block\Product\View\ListView" />
-    <preference for="Magento\CheckoutAgreements\Model\CheckoutAgreementsRepository" type="TrustMate\Opinions\Model\CheckoutAgreementsRepository" />
-    <preference for="Magento\CheckoutAgreements\Model\AgreementsConfigProvider" type="TrustMate\Opinions\Model\AgreementsConfigProvider" />
-    <preference for="Magento\CheckoutAgreements\Model\AgreementsProvider" type="TrustMate\Opinions\Model\AgreementsProvider" />
+    <preference for="TrustMate\Opinions\Api\Data\ProductReviewInterface" type="TrustMate\Opinions\Model\ProductReview"/>
+    <preference for="TrustMate\Opinions\Api\Data\ProductReviewSearchResultInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TrustMate\Opinions\Api\ProductReviewRepositoryInterface" type="TrustMate\Opinions\Model\ProductReviewRepository"/>
 
     <type name="Magento\Framework\Console\CommandList">
         <arguments>

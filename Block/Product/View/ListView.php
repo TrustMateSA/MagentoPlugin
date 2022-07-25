@@ -1,8 +1,10 @@
 <?php
 /**
  * @package   TrustMate\Opinions
- * @copyright 2019 TrustMate
+ * @copyright 2022 TrustMate
  */
+
+declare(strict_types=1);
 
 namespace TrustMate\Opinions\Block\Product\View;
 
@@ -18,9 +20,10 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\StringUtils;
 use Magento\Framework\Url\EncoderInterface;
 use Magento\Review\Block\Product\View\ListView as ProductListView;
+use Magento\Review\Model\ResourceModel\Review\Collection;
 use Magento\Review\Model\ResourceModel\Review\CollectionFactory;
 use Magento\Review\Model\Review;
-use TrustMate\Opinions\Helper\Data;
+use TrustMate\Opinions\Model\Config\Data;
 
 /**
  * Class ListView
@@ -84,14 +87,14 @@ class ListView extends ProductListView
     }
 
     /**
-     * @param  Review $review
+     * @param Review $review
      *
      * @return bool
      */
-    public function isTrustMateOpinion($review)
+    public function isTrustMateOpinion(Review $review): bool
     {
         if ($review) {
-            return $review->getTitle() == Data::OPINION_TITLE;
+            return $review->getTitle() === 'Opinia z TrustMate';
         }
 
         return false;
@@ -100,18 +103,15 @@ class ListView extends ProductListView
     /**
      * @inheritdoc
      */
-    public function getReviewsCollection()
+    public function getReviewsCollection(): Collection
     {
         $product = $this->getProduct();
 
         if (null === $this->_reviewsCollection) {
             $this->_reviewsCollection = $this->_reviewsColFactory->create()
-                ->addStoreFilter($this->_storeManager->getStore()->getId())
-                ->addStatusFilter(Review::STATUS_APPROVED)
-                ->setDateOrder();
-
-            if (!$this->helper->isProductsOpinionsEnabled()) {
-                $this->_reviewsCollection->addFieldToFilter('title', array('neq' => Data::OPINION_TITLE));
+            ->addFieldToFilter('store_id', ['eq' => $this->_storeManager->getStore()->getId()]);
+            if (!$this->helper->isProductOpinionEnabled()) {
+                $this->_reviewsCollection->addFieldToFilter('title', array('neq' => 'Opinia z TrustMate'));
                 $this->_reviewsCollection->addEntityFilter('product', $product->getId());
             } else {
                 if ($product->getTypeId() === Configurable::TYPE_CODE) {

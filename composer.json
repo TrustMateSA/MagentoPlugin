@@ -1,15 +1,26 @@
 {
     "name": "trustmate/magento-extension",
-    "description": "A Magento 2 plugin to integrate with TrustMate",
+    "description": "Plugin for integrate with opinions from Trustmate",
     "type": "magento2-module",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "license": [
         "OSL-3.0"
     ],
+    "keywords": [
+        "magento2",
+        "trustmate",
+        "opinions"
+    ],
     "require": {
-        "magento/framework": "~100.0.6"
+        "php": ">=7.2.0 < 8.0.0.",
+        "magento/framework": ">= 100.0.6"
     },
     "autoload": {
-        "files": [ "registration.php" ]
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "TrustMate\\Opinions\\": ""
+        }
     }
 }

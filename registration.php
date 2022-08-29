@@ -7,4 +7,8 @@
 
 use Magento\Framework\Component\ComponentRegistrar;
 
-ComponentRegistrar::register(ComponentRegistrar::MODULE, 'TrustMate_Opinions', __DIR__);
+ComponentRegistrar::register(
+    ComponentRegistrar::MODULE,
+    'TrustMate_Opinions',
+    __DIR__
+);

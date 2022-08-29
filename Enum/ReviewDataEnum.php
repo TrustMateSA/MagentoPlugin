@@ -11,4 +11,6 @@ namespace TrustMate\Opinions\Enum;
 class ReviewDataEnum
 {
     public const TRUSTMATE_REVIEW_ID_COLUMN = 'trustmate_review_id';
+    public const TRUSTMATE_RATING_CODE = 'TrustMate';
+    public const RATING_CODE_COLUMN = 'rating_code';
 }

@@ -110,11 +110,11 @@ class Save extends MagentoShippingSave
             $order = $shipment->getOrder();
             $data = [];
             $invitationData = [
-                'customer_name' => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
+                'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
                 'order_number' => $order->getIncrementId(),
                 'language' => strstr($this->resolver->getLocale(), '_', true),
-                'source_type' => 'magento'
+                'source_type' => 'magento2.1'
             ];
 
             if ($this->configData->isModuleEnabled()) {

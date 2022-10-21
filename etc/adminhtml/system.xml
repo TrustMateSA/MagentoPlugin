@@ -47,6 +47,20 @@
                         <field id="module_enabled">1</field>
                     </depends>
                 </field>
+                <field id="gtin_code" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>GTIN attribute code</label>
+                    <comment>Enter the attribute code that stores the GTIN code</comment>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="mpn_code" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>MPN attribute code</label>
+                    <comment>Enter the attribute code that stores the MPN code</comment>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
     </system>

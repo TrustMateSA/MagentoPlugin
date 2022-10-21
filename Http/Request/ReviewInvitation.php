@@ -55,7 +55,8 @@ class ReviewInvitation
             ];
         }
 
-        return $this->serializerInterface->unserialize($response->getBody()->getContents());
+        $bodyContent = $response->getBody()->getContents();
+        return $this->serializerInterface->unserialize($bodyContent);
     }
 
     /**

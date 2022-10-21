@@ -100,11 +100,11 @@ class Submit implements ObserverInterface
             $order = $observer->getEvent()->getOrder();
             $data = [];
             $invitationData = [
-                'customer_name' => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
+                'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
                 'order_number' => $order->getIncrementId(),
                 'language' => strstr($this->resolver->getLocale(), '_', true),
-                'source_type' => 'magento'
+                'source_type' => 'magento2.1'
             ];
 
             $data['body'] = $this->serializerInterface->serialize($invitationData);
@@ -117,6 +117,9 @@ class Submit implements ObserverInterface
                 foreach ($order->getItems() as $item) {
                     $product = $item->getProduct();
                     $store = $this->storeManager->getStore();
+                    $gtinCode = $this->configData->getGtinCode();
+                    $mpnCode = $this->configData->getMpnCode();
+
                     $invitationData['products'][] = [
                         'id' => $product->getSku(),
                         'name' => $product->getName(),
@@ -126,7 +129,9 @@ class Submit implements ObserverInterface
                         'image_url' => $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA)
                             . 'catalog/product' . $product->getImage(),
                         'image_thumb_url' => $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA)
-                            . 'catalog/product' . $product->getThumbnail()
+                            . 'catalog/product' . $product->getThumbnail(),
+                        'gtin' => $gtinCode ? $product->getData($gtinCode) : null,
+                        'mpn' => $mpnCode ? $product->getData($mpnCode) : null
                     ];
                 }
 

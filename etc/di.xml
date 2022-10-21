@@ -33,6 +33,8 @@
     <preference for="Magento\Review\Block\Product\Review" type="TrustMate\Opinions\Block\Product\Review" />
     <preference for="Magento\Review\Block\Product\ReviewRenderer" type="TrustMate\Opinions\Block\Product\ReviewRenderer" />
     <preference for="Magento\Review\Block\Product\View\ListView" type="TrustMate\Opinions\Block\Product\View\ListView" />
+    <preference for="Magento\Review\Model\ResourceModel\Review" type="TrustMate\Opinions\Model\ResourceModel\Review" />
+
     <preference for="TrustMate\Opinions\Api\Data\ProductReviewInterface" type="TrustMate\Opinions\Model\ProductReview"/>
     <preference for="TrustMate\Opinions\Api\Data\ProductReviewSearchResultInterface" type="Magento\Framework\Api\SearchResults"/>
     <preference for="TrustMate\Opinions\Api\ProductReviewRepositoryInterface" type="TrustMate\Opinions\Model\ProductReviewRepository"/>

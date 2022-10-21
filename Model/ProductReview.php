@@ -211,4 +211,52 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     {
         return $this->setData(self::ORIGINAL_BODY, $originalBody);
     }
+
+    /**
+     * @inheirtDoc
+     */
+    public function getOrderIncrementId(): ?string
+    {
+        return $this->getData(self::ORDER_INCREMENT_ID);
+    }
+
+    /**
+     * @inheirtDoc
+     */
+    public function setOrderIncrementId($orderIncrementId): ?ProductReviewInterface
+    {
+        return $this->setData(self::ORDER_INCREMENT_ID, $orderIncrementId);
+    }
+
+    /**
+     * @inheirtDoc
+     */
+    public function getGtinCode(): ?string
+    {
+        return $this->getData(self::GTIN_CODE);
+    }
+
+    /**
+     * @inheirtDoc
+     */
+    public function setGtinCode($gtinCode): ?ProductReviewInterface
+    {
+        return $this->setData(self::GTIN_CODE, $gtinCode);
+    }
+
+    /**
+     * @inheirtDoc
+     */
+    public function getMpnCode(): ?string
+    {
+        return $this->getData(self::MPN_CODE);
+    }
+
+    /**
+     * @inheirtDoc
+     */
+    public function setMpnCode($mpnCode): ?ProductReviewInterface
+    {
+        return $this->setData(self::MPN_CODE, $mpnCode);
+    }
 }

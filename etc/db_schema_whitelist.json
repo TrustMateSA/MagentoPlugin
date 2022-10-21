@@ -11,7 +11,10 @@
             "body": true,
             "public_identifier": true,
             "language": true,
-            "original_body": true
+            "original_body": true,
+            "order_increment_id": true,
+            "gtin_code": true,
+            "mpn_code": true
         },
         "constraint": {
             "PRIMARY": true

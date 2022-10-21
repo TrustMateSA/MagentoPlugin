@@ -134,7 +134,10 @@ class Review
                 'body' => $item['body'],
                 'public_identifier' => $item['publicIdentifier'],
                 'language' => $item['language'],
-                'original_body' => $originalBody
+                'original_body' => $originalBody,
+                'order_increment_id' => $item['orderIdentifier'],
+                'gtin_code' => $item['product']['gtin'],
+                'mpn_code' => $item['product']['mpn']
             ];
 
             if ($id = $this->reviewModel->checkIfExists($item['publicIdentifier'], $originalBody, $translation)) {

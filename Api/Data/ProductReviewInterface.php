@@ -23,6 +23,9 @@ interface ProductReviewInterface extends ExtensibleDataInterface
     public const PUBLIC_IDENTIFIER = 'public_identifier';
     public const LANGUAGE = 'language';
     public const ORIGINAL_BODY = 'original_body';
+    public const ORDER_INCREMENT_ID = 'order_increment_id';
+    public const GTIN_CODE = 'gtin_code';
+    public const MPN_CODE = 'mpn_code';
 
     /**
      * @return string|null
@@ -155,6 +158,42 @@ interface ProductReviewInterface extends ExtensibleDataInterface
      * @return ProductReviewInterface|null
      */
     public function setOriginalBody($originalBody): ?ProductReviewInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getOrderIncrementId(): ?string;
+
+    /**
+     * @param $orderIncrementId
+     *
+     * @return ProductReviewInterface|null
+     */
+    public function setOrderIncrementId($orderIncrementId): ?ProductReviewInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getGtinCode(): ?string;
+
+    /**
+     * @param $gtinCode
+     *
+     * @return ProductReviewInterface|null
+     */
+    public function setGtinCode($gtinCode): ?ProductReviewInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getMpnCode(): ?string;
+
+    /**
+     * @param $mpnCode
+     *
+     * @return ProductReviewInterface|null
+     */
+    public function setMpnCode($mpnCode): ?ProductReviewInterface;
 
     /**
      * @return \TrustMate\Opinions\Api\Data\ProductReviewExtensionInterface|null

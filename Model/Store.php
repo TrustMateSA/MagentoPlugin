@@ -52,7 +52,7 @@ class Store
                 $store->getId()
             );
 
-            $stores[strstr($localeCode, '_', true)] = $store->getId();
+            $stores[strstr($localeCode, '_', true)][] = $store->getId();
         }
 
         return $stores;

@@ -221,7 +221,7 @@ class Review
         $reviewData['entity_pk_value'] = $productId;
         $reviewData['status_id'] = MagentoReview::STATUS_APPROVED;
         $reviewData['store_id'] = $storesLocale[$language];
-        $reviewData['stores'] = (int) $storesLocale[$language];
+        $reviewData['stores'] = $storesLocale[$language];
 
         $this->reviewResource->load(
             $reviewModel,
@@ -247,6 +247,12 @@ class Review
             );
 
             $reviewModel->aggregate();
+            $this->saveReviewDetailForAllStores($reviewModel->getId(), $reviewData['stores']);
         }
+    }
+
+    private function saveReviewDetailForAllStores()
+    {
+
     }
 }

@@ -11,6 +11,8 @@ namespace TrustMate\Opinions\Controller\Adminhtml\Order\Shipment;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Helper\Data as SalesData;
 use Magento\Sales\Model\Order\Email\Sender\ShipmentSender;
@@ -18,14 +20,12 @@ use Magento\Sales\Model\Order\Shipment\ShipmentValidatorInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as MagentoShippingSave;
 use Magento\Shipping\Controller\Adminhtml\Order\ShipmentLoader;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 use TrustMate\Opinions\Enum\TrustMateConfigDataEnum;
 use TrustMate\Opinions\Http\Request\ReviewInvitation;
-use TrustMate\Opinions\Model\Config\Data;
 use TrustMate\Opinions\Model\Category;
-use Magento\Framework\Locale\Resolver;
-use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use TrustMate\Opinions\Logger\Logger;
+use TrustMate\Opinions\Model\Config\Data;
 
 class Save extends MagentoShippingSave
 {
@@ -60,32 +60,32 @@ class Save extends MagentoShippingSave
     protected $storeManager;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
     public function __construct(
-        Context $context,
-        ShipmentLoader $shipmentLoader,
-        LabelGenerator $labelGenerator,
-        ShipmentSender $shipmentSender,
-        ReviewInvitation $reviewInvitation,
-        Data $configData,
-        Category $category,
-        Resolver $resolver,
-        SerializerInterface $serializerInterface,
-        StoreManagerInterface $storeManager,
-        Logger $logger,
+        Context                    $context,
+        ShipmentLoader             $shipmentLoader,
+        LabelGenerator             $labelGenerator,
+        ShipmentSender             $shipmentSender,
+        ReviewInvitation           $reviewInvitation,
+        Data                       $configData,
+        Category                   $category,
+        Resolver                   $resolver,
+        SerializerInterface        $serializerInterface,
+        StoreManagerInterface      $storeManager,
+        LoggerInterface            $logger,
         ShipmentValidatorInterface $shipmentValidator = null,
-        SalesData $salesData = null
+        SalesData                  $salesData = null
     ) {
-        $this->reviewInvitation = $reviewInvitation;
-        $this->configData = $configData;
-        $this->category = $category;
-        $this->resolver = $resolver;
+        $this->reviewInvitation    = $reviewInvitation;
+        $this->configData          = $configData;
+        $this->category            = $category;
+        $this->resolver            = $resolver;
         $this->serializerInterface = $serializerInterface;
-        $this->storeManager = $storeManager;
-        $this->logger = $logger;
+        $this->storeManager        = $storeManager;
+        $this->logger              = $logger;
 
         parent::__construct(
             $context,
@@ -107,8 +107,8 @@ class Save extends MagentoShippingSave
         if ($this->configData->isModuleEnabled()
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::CREATE_SHIPMENT_EVENT
         ) {
-            $order = $shipment->getOrder();
-            $data = [];
+            $order          = $shipment->getOrder();
+            $data           = [];
             $invitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
@@ -119,7 +119,7 @@ class Save extends MagentoShippingSave
 
             if ($this->configData->isModuleEnabled()) {
                 $data['body'] = $this->serializerInterface->serialize($invitationData);
-                $response = $this->reviewInvitation->sendRequest($data);
+                $response     = $this->reviewInvitation->sendRequest($data);
                 if (isset($response['status'])) {
                     $this->logger->error($response['message']);
                 }
@@ -127,8 +127,8 @@ class Save extends MagentoShippingSave
 
             if ($this->configData->isProductOpinionEnabled()) {
                 foreach ($order->getItems() as $item) {
-                    $product = $item->getProduct();
-                    $store = $this->storeManager->getStore();
+                    $product                      = $item->getProduct();
+                    $store                        = $this->storeManager->getStore();
                     $invitationData['products'][] = [
                         'id' => $product->getSku(),
                         'name' => $product->getName(),
@@ -141,8 +141,12 @@ class Save extends MagentoShippingSave
                     ];
                 }
 
+                if ($this->configData->isSandboxEnabled()) {
+                    $this->logger->info(print_r($invitationData, true));
+                }
+
                 $data['body'] = $this->serializerInterface->serialize($invitationData);
-                $response = $this->reviewInvitation->sendRequest($data);
+                $response     = $this->reviewInvitation->sendRequest($data);
                 if (isset($response['status'])) {
                     $this->logger->error($response['message']);
                 }

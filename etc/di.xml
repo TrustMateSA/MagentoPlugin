@@ -46,4 +46,25 @@
             </argument>
         </arguments>
     </type>
+
+    <virtualType name="TrustMateLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="error" xsi:type="object">TrustMate\Opinions\Logger\Handler\InfoHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TrustMate\Opinions\Observer\Checkout\Submit">
+        <arguments>
+            <argument name="logger" xsi:type="object">TrustMateLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="TrustMate\Opinions\Controller\Adminhtml\Order\Shipment\Save">
+        <arguments>
+            <argument name="logger" xsi:type="object">TrustMateLogger</argument>
+        </arguments>
+    </type>
+
 </config>

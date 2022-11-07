@@ -22,6 +22,7 @@ class Data
     public const STORE_ID = 'trustmate_opinions_section/general/store_id';
     public const GTIN_CODE = 'trustmate_opinions_section/general/gtin_code';
     public const MPN_CODE = 'trustmate_opinions_section/general/mpn_code';
+    public const FIX_LOCALID = 'trustmate_opinions_section/general/fix_localid';
 
     /**
      * @var ScopeConfigInterface
@@ -171,6 +172,22 @@ class Data
     {
         return $this->scopeConfigInterface->getValue(
             self::MPN_CODE,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * Return status of module
+     *
+     * @param int|null $storeId
+     *
+     * @return bool
+     */
+    public function isFixLocalIdEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfigInterface->isSetFlag(
+            self::FIX_LOCALID,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );

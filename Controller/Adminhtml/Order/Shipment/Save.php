@@ -128,9 +128,10 @@ class Save extends MagentoShippingSave
             if ($this->configData->isProductOpinionEnabled()) {
                 foreach ($order->getItems() as $item) {
                     $product                      = $item->getProduct();
+                    $localId                      = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
                     $store                        = $this->storeManager->getStore();
                     $invitationData['products'][] = [
-                        'id' => $product->getSku(),
+                        'id' => $localId,
                         'name' => $product->getName(),
                         'product_url' => $product->getProductUrl(),
                         'category' => $this->category->getCategoriesPath($product->getCategoryIds()),

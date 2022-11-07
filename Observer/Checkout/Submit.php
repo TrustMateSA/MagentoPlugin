@@ -116,12 +116,13 @@ class Submit implements ObserverInterface
             if ($this->configData->isProductOpinionEnabled()) {
                 foreach ($order->getItems() as $item) {
                     $product  = $item->getProduct();
+                    $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
                     $store    = $this->storeManager->getStore();
                     $gtinCode = $this->configData->getGtinCode();
                     $mpnCode  = $this->configData->getMpnCode();
 
                     $invitationData['products'][] = [
-                        'id' => $product->getSku(),
+                        'id' => $localId,
                         'name' => $product->getName(),
                         'sku' => $product->getSku(),
                         'product_url' => $product->getProductUrl(),

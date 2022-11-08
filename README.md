@@ -1,6 +1,9 @@
 # Plugin installation:
 
-## 1. Unpack archive and move to app/code directory
+## 1. Install or update using composer
+
+`composer require trustmate/magento-extension`
+`composer update trustmate/magento-extension`
 
 ## 2. From command line run:
   * php bin/magento module:enable TrustMate_Opinions
@@ -18,11 +21,27 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 
 # Upgrading
 
+
+## To version 2.1.0
+
+* Due to bug in some older versions, if your products are identified in TrustMate using database identifier instead of SKU - please use new configuration option to keep this behaviour. Without it you may notice that new orders create brand new products on TrustMate side ignoring all existing ones.
+
 ## To version 1.2.0
 
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
 #### Change log
+
+##### 2.1.0 (2022-11-08)
+- Added support for GTIN/EAN/MPN synchronization for Google integration
+- Customer surnames are no longer passed to review invitations
+- Order identifier are saved along with reviews
+- Product identifier can be changed (required for backward compatibility is some rare cases)
+- Fixed translation synchronization for multiple stores in same language
+
+##### 2.0.0 (2022-07-25)
+- Switched to GitHub releases
+- Functionally the same as 1.2.0
 
 ##### 1.2.0 (2022-04-20)
 - Reviews can now being updated if changed in TrustMate

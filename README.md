@@ -3,6 +3,7 @@
 ## 1. Install or update using composer
 
 `composer require trustmate/magento-extension`
+
 `composer update trustmate/magento-extension`
 
 ## 2. From command line run:

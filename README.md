@@ -45,7 +45,7 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 - Functionally the same as 1.2.0
 
 ##### 1.2.0 (2022-04-20)
-- Reviews can now being updated if changed in TrustMate
+- Reviews can now be updated if changed in TrustMate
 - Reviews can be updated retrospectively using command line
 - Added support for review translations
 - Added support for product thumbnails

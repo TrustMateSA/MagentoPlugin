@@ -1,4 +1,4 @@
-# Plugin installation:
+# Plugin installation
 
 ## 1. Install or update using composer
 
@@ -6,13 +6,13 @@
 
 `composer update trustmate/magento-extension`
 
-## 2. From command line run:
+## 2. From command line run
   * php bin/magento module:enable TrustMate_Opinions
   * php bin/magento setup:upgrade
   * php bin/magento setup:di:compile
-  * php bin/magento setup:static-content:deploy pl_PL en_US
+  * php bin/magento setup:static-content:deploy pl_PL en_US (languages of your choice)
 
-## 3. You can now configure plugin in Magento admin panel in TrustMate → Settings
+## 3. Configure plugin in Magento admin panel in TrustMate → Settings
 
 ## 4. After configuration clear the cache
 
@@ -32,6 +32,9 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
 #### Change log
+
+##### 2.1.1 (2022-11-15)
+- Added support for PHP 8.1
 
 ##### 2.1.0 (2022-11-08)
 - Added support for GTIN/EAN/MPN synchronization for Google integration

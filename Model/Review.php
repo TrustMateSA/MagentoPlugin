@@ -16,20 +16,14 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Review\Model\RatingFactory;
-use Magento\Review\Model\ResourceModel\Rating as RatingResource;
 use Magento\Review\Model\ResourceModel\Review as SourceReviewResource;
 use Magento\Review\Model\Review as MagentoReview;
 use Magento\Review\Model\ReviewFactory;
-use Magento\Store\Model\ScopeInterface;
 use TrustMate\Opinions\Api\ProductReviewRepositoryInterface;
 use TrustMate\Opinions\Enum\ReviewDataEnum;
-use TrustMate\Opinions\Enum\StoreDataEnum;
 use TrustMate\Opinions\Enum\TrustMateDataEnum;
-use TrustMate\Opinions\Model\Store;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use TrustMate\Opinions\Model\Rating;
-use TrustMate\Opinions\Model\Option;
+use TrustMate\Opinions\Model\Option as TrustMateOption;
+use TrustMate\Opinions\Model\Rating as TrustMateRating;
 
 class Review
 {
@@ -74,11 +68,6 @@ class Review
     private $store;
 
     /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
      * @var Rating
      */
     private $rating;
@@ -90,16 +79,15 @@ class Review
 
     /**
      * @param ProductReviewRepositoryInterface $productReviewRepositoryInterface
-     * @param Filter $filter
-     * @param FilterGroup $filterGroup
-     * @param SearchCriteriaInterface $searchCriteriaInterface
-     * @param SortOrder $sortOrder
-     * @param Store $store
-     * @param ProductRepositoryInterface $productRepository
-     * @param \TrustMate\Opinions\Model\Rating $rating
-     * @param \TrustMate\Opinions\Model\Option $option
-     * @param ReviewFactory $reviewFactory
-     * @param SourceReviewResource $reviewResource
+     * @param Filter                           $filter
+     * @param FilterGroup                      $filterGroup
+     * @param SearchCriteriaInterface          $searchCriteriaInterface
+     * @param SortOrder                        $sortOrder
+     * @param Store                            $store
+     * @param TrustMateRating                  $rating
+     * @param TrustMateOption                  $option
+     * @param ReviewFactory                    $reviewFactory
+     * @param SourceReviewResource             $reviewResource
      */
     public function __construct(
         ProductReviewRepositoryInterface $productReviewRepositoryInterface,
@@ -108,23 +96,21 @@ class Review
         SearchCriteriaInterface          $searchCriteriaInterface,
         SortOrder                        $sortOrder,
         Store                            $store,
-        ProductRepositoryInterface       $productRepository,
         Rating                           $rating,
         Option                           $option,
         ReviewFactory                    $reviewFactory,
         SourceReviewResource             $reviewResource
     ) {
         $this->productReviewRepositoryInterface = $productReviewRepositoryInterface;
-        $this->filter = $filter;
-        $this->filterGroup = $filterGroup;
-        $this->searchCriteriaInterface = $searchCriteriaInterface;
-        $this->sortOrder = $sortOrder;
-        $this->store = $store;
-        $this->productRepository = $productRepository;
-        $this->rating = $rating;
-        $this->option = $option;
-        $this->reviewFactory = $reviewFactory;
-        $this->reviewResource = $reviewResource;
+        $this->filter                           = $filter;
+        $this->filterGroup                      = $filterGroup;
+        $this->searchCriteriaInterface          = $searchCriteriaInterface;
+        $this->sortOrder                        = $sortOrder;
+        $this->store                            = $store;
+        $this->rating                           = $rating;
+        $this->option                           = $option;
+        $this->reviewFactory                    = $reviewFactory;
+        $this->reviewResource                   = $reviewResource;
     }
 
     /**
@@ -141,14 +127,14 @@ class Review
         $updatedAtOrder = $this->sortOrder
             ->setField('updated_at')
             ->setDirection(SortOrder::SORT_DESC);
-        $nullCondition = $this->filter
+        $nullCondition  = $this->filter
             ->setField('original_body')
             ->setConditionType('null')
             ->setValue(1);
 
         $filterGroup = $this->filterGroup;
         if ($translation) {
-            $notNullCondition = $this->filter
+            $nullCondition = $this->filter
                 ->setField('original_body')
                 ->setConditionType('notnull')
                 ->setValue(1);
@@ -168,9 +154,9 @@ class Review
     /**
      * Check if review exists and return id
      *
-     * @param string $publicIdentifier
+     * @param string      $publicIdentifier
      * @param string|null $originalBody
-     * @param bool $translation
+     * @param bool        $translation
      *
      * @return null|string
      * @throws LocalizedException
@@ -183,7 +169,7 @@ class Review
             ->setValue($publicIdentifier);
 
         $publicIdentifierFilterGroup = $this->filterGroup->setFilters([$publicIdentifierFilter]);
-        $originalBodyFilterGroup = $this->filterGroup;
+        $originalBodyFilterGroup     = $this->filterGroup;
         if ($translation) {
             $notNullCondition = $this->filter
                 ->setField('original_body')
@@ -195,7 +181,7 @@ class Review
 
         $searchCriteria = $this->searchCriteriaInterface
             ->setFilterGroups([$publicIdentifierFilterGroup, $originalBodyFilterGroup]);
-        $review = $this->productReviewRepositoryInterface->getList($searchCriteria)->getItems();
+        $review         = $this->productReviewRepositoryInterface->getList($searchCriteria)->getItems();
 
         return empty($review)
             ? null
@@ -214,14 +200,12 @@ class Review
     public function saveReviewToMagento($reviewData, $language)
     {
         $storesLocale = $this->store->getStoreLocales();
-        $reviewModel = $this->reviewFactory->create();
-        $productId = $this->productRepository->get($reviewData['sku'])->getId();
+        $reviewModel  = $this->reviewFactory->create();
 
         $reviewData['entity_id'] = $reviewModel->getEntityIdByCode(MagentoReview::ENTITY_PRODUCT_CODE);
-        $reviewData['entity_pk_value'] = $productId;
         $reviewData['status_id'] = MagentoReview::STATUS_APPROVED;
-        $reviewData['store_id'] = $storesLocale[$language];
-        $reviewData['stores'] = $storesLocale[$language];
+        $reviewData['store_id']  = $storesLocale[$language];
+        $reviewData['stores']    = $storesLocale[$language];
 
         $this->reviewResource->load(
             $reviewModel,
@@ -234,7 +218,7 @@ class Review
 
         if ($reviewModel->getId()) {
             $trustMateRating = $this->rating->getRatingByCode('TrustMate');
-            $optionData = $this->option->getOptionByRatingIdAndValue(
+            $optionData      = $this->option->getOptionByRatingIdAndValue(
                 $trustMateRating['rating_id'],
                 $reviewData['grade']
             );
@@ -242,17 +226,11 @@ class Review
             $this->rating->saveRating(
                 $trustMateRating['rating_id'],
                 $optionData['option_id'],
-                $productId,
+                $reviewData['entity_pk_value'],
                 $reviewModel->getId()
             );
 
             $reviewModel->aggregate();
-            $this->saveReviewDetailForAllStores($reviewModel->getId(), $reviewData['stores']);
         }
-    }
-
-    private function saveReviewDetailForAllStores()
-    {
-
     }
 }

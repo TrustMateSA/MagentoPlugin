@@ -18,6 +18,7 @@ use TrustMate\Opinions\Model\Config\Data;
 use TrustMate\Opinions\Model\ProductReviewFactory;
 use TrustMate\Opinions\Model\ResourceModel\ProductReview as ProductReviewResource;
 use TrustMate\Opinions\Model\Review as ReviewModel;
+use TrustMate\Opinions\Model\Store;
 
 class Review
 {
@@ -57,6 +58,11 @@ class Review
     private $productRepository;
 
     /**
+     * @var Store
+     */
+    private $store;
+
+    /**
      * @param ProductReview              $httpProductReview
      * @param ReviewModel                $reviewModel
      * @param ProductReviewFactory       $productReview
@@ -72,7 +78,8 @@ class Review
         ProductReviewResource      $productReviewResource,
         Logger                     $logger,
         ProductRepositoryInterface $productRepository,
-        Data                       $config
+        Data                       $config,
+        Store                      $store
     ) {
         $this->httpProductReview     = $httpProductReview;
         $this->reviewModel           = $reviewModel;
@@ -81,6 +88,7 @@ class Review
         $this->logger                = $logger;
         $this->productRepository     = $productRepository;
         $this->config                = $config;
+        $this->store                 = $store;
     }
 
     /**
@@ -142,7 +150,6 @@ class Review
     private function save(array $reviews, bool $translation = false)
     {
         foreach ($reviews['items'] as $item) {
-            $productReview = $this->productReview->create();
             $originalBody  = (!isset($item['originalBody'])) ? null : $item['originalBody'];
             $productId     = $item['product']['localId'];
             if ($this->config->isFixLocalIdEnabled()) {
@@ -155,6 +162,7 @@ class Review
             }
 
             $data = [
+                'id' => $this->reviewModel->checkIfExists($item['publicIdentifier'], $originalBody, $translation),
                 'created_at' => $item['createdAt'],
                 'updated_at' => $item['updatedAt'],
                 'grade' => $item['grade'],
@@ -170,23 +178,23 @@ class Review
                 'mpn_code' => $item['product']['mpn']
             ];
 
-            if ($id = $this->reviewModel->checkIfExists($item['publicIdentifier'], $originalBody, $translation)) {
-                $data['id'] = $id;
-            }
-
+            $productReview = $this->productReview->create();
             $productReview->setData($data);
             $this->productReviewResource->save($productReview);
 
-            $reviewData = [
-                'trustmate_review_id' => $productReview->getId(),
-                'title' => 'Opinia z TrustMate',
-                'detail' => $data['body'],
-                'nickname' => $data['author_name'],
-                'grade' => $data['grade'],
-                'entity_pk_value' => $data['product']
-            ];
+            foreach ($this->store->getStoreLocales()[$data['language']] as $storeLocale) {
+                $reviewData = [
+                    'trustmate_review_id' => $productReview->getId(),
+                    'title' => 'Opinia z TrustMate',
+                    'detail' => $data['body'],
+                    'nickname' => $data['author_name'],
+                    'grade' => $data['grade'],
+                    'entity_pk_value' => $data['product'],
+                    'review_store_id' => $storeLocale
+                ];
 
-            $this->reviewModel->saveReviewToMagento($reviewData, $data['language']);
+                $this->reviewModel->saveReviewToMagento($reviewData, $storeLocale);
+            }
         }
     }
 }

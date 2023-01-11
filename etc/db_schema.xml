@@ -23,8 +23,15 @@
     <table name="review">
         <column xsi:type="smallint" name="trustmate_review_id" unsigned="true" nullable="true" identity="false"
                 default="0" comment="Trustmate Review ID"/>
+        <column xsi:type="smallint" name="review_store_id" unsigned="true" nullable="true" identity="false"
+                default="0" comment="Store ID"/>
+        <constraint xsi:type="foreign" referenceId="REVIEW_REVIEW_STORE_ID_STORE_STORE_ID" table="review"
+                    column="review_store_id" referenceTable="store" referenceColumn="store_id" onDelete="SET NULL"/>
         <index referenceId="REVIEW_TRUSTMATE_REVIEW_ID" indexType="btree">
             <column name="trustmate_review_id"/>
+        </index>
+        <index referenceId="REVIEW_REVIEW_STORE_ID" indexType="btree">
+            <column name="review_store_id"/>
         </index>
     </table>
     <table name="sales_order" resource="default">

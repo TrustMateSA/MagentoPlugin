@@ -41,10 +41,17 @@ class Review extends MagentoReview
                 $connection->update($this->_reviewDetailTable, $detail, $condition);
             }
         } else {
-            foreach ($object->getStoreId() as $storeId) {
-                $detail['store_id']    = $storeId;
+            if (is_array($object->getStoreId())) {
+                foreach ($object->getStoreId() as $storeId) {
+                    $detail['store_id']    = $storeId;
+                    $detail['customer_id'] = $object->getCustomerId();
+                    $detail['review_id']   = $object->getId();
+                    $connection->insert($this->_reviewDetailTable, $detail);
+                }
+            } else {
+                $detail['store_id'] = $object->getStoreId();
                 $detail['customer_id'] = $object->getCustomerId();
-                $detail['review_id']   = $object->getId();
+                $detail['review_id'] = $object->getId();
                 $connection->insert($this->_reviewDetailTable, $detail);
             }
         }

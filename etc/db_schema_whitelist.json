@@ -22,10 +22,15 @@
     },
     "review": {
         "column": {
-            "trustmate_review_id": true
+            "trustmate_review_id": true,
+            "review_store_id": true
         },
         "index": {
-            "REVIEW_TRUSTMATE_REVIEW_ID": true
+            "REVIEW_TRUSTMATE_REVIEW_ID": true,
+            "REVIEW_REVIEW_STORE_ID": true
+        },
+        "constraint": {
+            "REVIEW_REVIEW_STORE_ID_STORE_STORE_ID": true
         }
     },
     "sales_order": {

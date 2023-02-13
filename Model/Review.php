@@ -127,19 +127,31 @@ class Review
         $updatedAtOrder = $this->sortOrder
             ->setField('updated_at')
             ->setDirection(SortOrder::SORT_DESC);
-        $nullCondition  = $this->filterBuilder
-            ->setField('original_body')
-            ->setConditionType('null')
-            ->setValue(1)
-            ->create();
 
         if ($translation) {
-            $nullCondition->setConditionType('notnull')
-                ->setValue(1);
+            $notNullCondition  = $this->filterBuilder
+                ->setField('original_body')
+                ->setConditionType('notnull')
+                ->setValue(1)
+                ->create();
+            $notNullFilterGroup = $this->filterGroupBuilder
+                ->addFilter($notNullCondition)
+                ->create();
+        } else {
+            $nullCondition  = $this->filterBuilder
+                ->setField('original_body')
+                ->setConditionType('null')
+                ->setValue(0)
+                ->create();
+            $nullFilterGroup = $this->filterGroupBuilder
+                ->addFilter($nullCondition)
+                ->create();
         }
 
+        $filtersGroup = isset($nullCondition) ? $nullFilterGroup : $notNullFilterGroup;
+
         $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilters([$nullCondition])
+            ->setFilterGroups([$filtersGroup])
             ->setPageSize(1)
             ->setSortOrders([$updatedAtOrder])
             ->create();

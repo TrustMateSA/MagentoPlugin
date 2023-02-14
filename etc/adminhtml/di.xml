@@ -1,6 +1,20 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DECLARE PLUGINS -->
+
+    <type name="Magento\Review\Model\ResourceModel\Review\Product\Collection">
+        <plugin name="trustmate_after_load_product_review_collection"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Product\Collection"
+                sortOrder="1" disabled="false"/>
+    </type>
+
+    <!-- END OF DECLARE PLUGINS -->
+
+    <!-- DECLARE PREFERENCES -->
+
     <preference for="Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save"
                 type="TrustMate\Opinions\Controller\Adminhtml\Order\Shipment\Save"/>
+
+    <!-- END OF DECLARE PREFERENCES -->
 </config>

@@ -150,7 +150,7 @@ class Review
     private function save(array $reviews, bool $translation = false)
     {
         foreach ($reviews['items'] as $item) {
-            $originalBody  = (!isset($item['originalBody'])) ? null : $item['originalBody'];
+            $originalBody  = (!isset($item['originalBody']) || !$item['originalBody']) ? null : $item['originalBody'];
             $productId     = $item['product']['localId'];
             if ($this->config->isFixLocalIdEnabled()) {
                 try {
@@ -169,13 +169,14 @@ class Review
                 'author_email' => $item['author']['email'],
                 'author_name' => $item['author']['name'],
                 'product' => $productId,
-                'body' => $item['body'],
+                'body' => !$item['body'] ? ' ' : $item['body'],
                 'public_identifier' => $item['publicIdentifier'],
                 'language' => $item['language'],
                 'original_body' => $originalBody,
                 'order_increment_id' => $item['orderIdentifier'],
                 'gtin_code' => $item['product']['gtin'],
-                'mpn_code' => $item['product']['mpn']
+                'mpn_code' => $item['product']['mpn'],
+                'status' => $item['status']
             ];
 
             $productReview = $this->productReview->create();

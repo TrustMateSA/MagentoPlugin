@@ -1,19 +1,6 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="TrustMate\Opinions\Logger\Handler">
-        <arguments>
-            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
-        </arguments>
-    </type>
-
-    <type name="TrustMate\Opinions\Logger\Logger">
-        <arguments>
-            <argument name="name" xsi:type="string">TrustMateLogger</argument>
-            <argument name="handlers"  xsi:type="array">
-                <item name="system" xsi:type="object">TrustMate\Opinions\Logger\Handler</item>
-            </argument>
-        </arguments>
-    </type>
+    <!-- DECLARE VIRTUAL TYPES -->
 
     <virtualType name="TrustMateOpinionsGrid" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -30,6 +17,10 @@
         </arguments>
     </type>
 
+    <!-- END OF DECLARE VIRTUAL TYPES -->
+
+    <!-- DECLARE PREFERENCES -->
+
     <preference for="Magento\Review\Block\Product\Review" type="TrustMate\Opinions\Block\Product\Review" />
     <preference for="Magento\Review\Block\Product\ReviewRenderer" type="TrustMate\Opinions\Block\Product\ReviewRenderer" />
     <preference for="Magento\Review\Block\Product\View\ListView" type="TrustMate\Opinions\Block\Product\View\ListView" />
@@ -39,10 +30,31 @@
     <preference for="TrustMate\Opinions\Api\Data\ProductReviewSearchResultInterface" type="Magento\Framework\Api\SearchResults"/>
     <preference for="TrustMate\Opinions\Api\ProductReviewRepositoryInterface" type="TrustMate\Opinions\Model\ProductReviewRepository"/>
 
+    <!--  END OF DECLARE PREFERENCES -->
+
+    <!-- DECLARE LOGGER -->
+
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="trustmate_import_opinions" xsi:type="object">TrustMate\Opinions\Console\Command\ImportReviews</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- DECLARE LOGGER -->
+
+    <type name="TrustMate\Opinions\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="TrustMate\Opinions\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">TrustMateLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">TrustMate\Opinions\Logger\Handler</item>
             </argument>
         </arguments>
     </type>
@@ -67,4 +79,11 @@
         </arguments>
     </type>
 
+    <!-- END OF DECLARE LOGGER -->
+
+    <type name="Magento\Review\Model\ResourceModel\Review\Product\Collection">
+        <plugin name="trustmate_after_load_product_items_review_collection"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Product\Collection"
+                sortOrder="20" disabled="false"/>
+    </type>
 </config>

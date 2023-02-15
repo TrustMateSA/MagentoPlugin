@@ -42,7 +42,10 @@ class Collection implements ObserverInterface
             [$trustMateTableName],
             $joinConditions,
             []
-        )->columns($trustMateTableName . '.language');
+        )->columns([
+            $trustMateTableName . '.language',
+            $trustMateTableName . '.status',
+        ]);
 
         $joinConditions = 'main_table.review_id = detail.review_id';
         $observer->getCollection()->getSelect()->join(

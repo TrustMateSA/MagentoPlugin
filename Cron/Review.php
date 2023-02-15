@@ -81,7 +81,8 @@ class Review
         $preparedData['query'] = [
             'start' => $this->reviewModel->getLatestUpdatedDate($addLanguage),
             'per_page' => 1000,
-            'page' => 1
+            'page' => 1,
+            'sort' => 'updatedAt'
         ];
 
         if ($addLanguage) {

@@ -80,4 +80,10 @@
     </type>
 
     <!-- END OF DECLARE LOGGER -->
+
+    <type name="Magento\Review\Model\ResourceModel\Review\Product\Collection">
+        <plugin name="trustmate_after_load_product_items_review_collection"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Product\Collection"
+                sortOrder="20" disabled="false"/>
+    </type>
 </config>

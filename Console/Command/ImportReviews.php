@@ -102,7 +102,8 @@ class ImportReviews extends Command
         $data['query'] = [
             "start" => $this->reviewModel->getLatestUpdatedDate(),
             'per_page' => 1000,
-            'page' => 1
+            'page' => 1,
+            'sort' => 'updatedAt'
         ];
 
         $this->reviewService->add($data);

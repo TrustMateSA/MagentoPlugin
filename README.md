@@ -33,6 +33,11 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 
 #### Change log
 
+##### 2.1.6 (2023-02-15)
+- Reviews which became unpublished are now soft-deleted on Magento side
+- Fixed issue with multiple stores with same language
+- Fixed managing reviews with empty body
+
 ##### 2.1.1 (2022-11-15)
 - Added support for PHP 8.1
 

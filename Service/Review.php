@@ -14,7 +14,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use TrustMate\Opinions\Http\Request\ProductReview;
 use TrustMate\Opinions\Logger\Logger;
-use TrustMate\Opinions\Model\Config\Data;
 use TrustMate\Opinions\Model\ProductReviewFactory;
 use TrustMate\Opinions\Model\ResourceModel\ProductReview as ProductReviewResource;
 use TrustMate\Opinions\Model\Review as ReviewModel;
@@ -48,11 +47,6 @@ class Review
     private $logger;
 
     /**
-     * @var Data
-     */
-    private $config;
-
-    /**
      * @var ProductRepositoryInterface
      */
     private $productRepository;
@@ -69,7 +63,7 @@ class Review
      * @param ProductReviewResource      $productReviewResource
      * @param Logger                     $logger
      * @param ProductRepositoryInterface $productRepository
-     * @param Data                       $config
+     * @param Store                      $store
      */
     public function __construct(
         ProductReview              $httpProductReview,
@@ -78,7 +72,6 @@ class Review
         ProductReviewResource      $productReviewResource,
         Logger                     $logger,
         ProductRepositoryInterface $productRepository,
-        Data                       $config,
         Store                      $store
     ) {
         $this->httpProductReview     = $httpProductReview;
@@ -87,7 +80,6 @@ class Review
         $this->productReviewResource = $productReviewResource;
         $this->logger                = $logger;
         $this->productRepository     = $productRepository;
-        $this->config                = $config;
         $this->store                 = $store;
     }
 
@@ -150,15 +142,12 @@ class Review
     private function save(array $reviews, bool $translation = false)
     {
         foreach ($reviews['items'] as $item) {
-            $originalBody  = (!isset($item['originalBody']) || !$item['originalBody']) ? null : $item['originalBody'];
-            $productId     = $item['product']['localId'];
-            if ($this->config->isFixLocalIdEnabled()) {
-                try {
-                    $product   = $this->productRepository->get($item['product']['localId']);
-                    $productId = $product->getId();
-                } catch (NoSuchEntityException $e) {
-                    $this->logger->info($e->getMessage());
-                }
+            $originalBody   = (!isset($item['originalBody']) || !$item['originalBody']) ? null : $item['originalBody'];
+            $productLocalId = $item['product']['localId'];
+            try {
+                $product = $this->productRepository->get($productLocalId);
+            } catch (NoSuchEntityException $e) {
+                $product = $this->productRepository->getById($productLocalId);
             }
 
             $data = [
@@ -168,7 +157,7 @@ class Review
                 'grade' => $item['grade'],
                 'author_email' => $item['author']['email'],
                 'author_name' => $item['author']['name'],
-                'product' => $productId,
+                'product' => $product->getSku(),
                 'body' => !$item['body'] ? ' ' : $item['body'],
                 'public_identifier' => $item['publicIdentifier'],
                 'language' => $item['language'],
@@ -190,7 +179,7 @@ class Review
                     'detail' => $data['body'],
                     'nickname' => $data['author_name'],
                     'grade' => $data['grade'],
-                    'entity_pk_value' => $data['product'],
+                    'entity_pk_value' => $product->getId(),
                     'review_store_id' => $storeLocale
                 ];
 

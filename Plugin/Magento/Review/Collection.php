@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TrustMate\Opinions\Plugin\Magento\Review\Product;
+namespace TrustMate\Opinions\Plugin\Magento\Review;
 
 class Collection
 {

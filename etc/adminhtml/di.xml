@@ -8,6 +8,11 @@
                 type="TrustMate\Opinions\Plugin\Magento\Review\Product\Collection"
                 sortOrder="10" disabled="false"/>
     </type>
+    <type name="Magento\Review\Model\ResourceModel\Review\Collection">
+        <plugin name="trustmate_around_add_item_review_collection"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Collection"
+                sortOrder="10" disabled="false"/>
+    </type>
 
     <!-- END OF DECLARE PLUGINS -->
 

@@ -132,7 +132,6 @@ class ProductReviewRepository implements ProductReviewRepositoryInterface
         $productReviewCollection = $this->productReviewCollectionFactory->create();
         $this->collectionProcessor->process($searchCriteria, $productReviewCollection);
         $searchResults = $this->searchResultFactory->create();
-
         $searchResults->setSearchCriteria($searchCriteria);
         $searchResults->setItems($productReviewCollection->getItems());
 

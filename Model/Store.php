@@ -10,51 +10,39 @@ namespace TrustMate\Opinions\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use TrustMate\Opinions\Enum\StoreDataEnum;
 
 class Store
 {
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
     /**
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
 
     /**
-     * @param StoreManagerInterface $storeManager
-     * @param ScopeConfigInterface $scopeConfig
+     * @param ScopeConfigInterface  $scopeConfig
      */
     public function __construct(
-        StoreManagerInterface $storeManager,
         ScopeConfigInterface  $scopeConfig
     ) {
-        $this->storeManager = $storeManager;
-        $this->scopeConfig = $scopeConfig;
+        $this->scopeConfig  = $scopeConfig;
     }
 
     /**
      * Get stores locale
      *
-     * @return array
+     * @param int $storeId
+     *
+     * @return string
      */
-    public function getStoreLocales(): array
+    public function getStoreLocales(int $storeId): string
     {
-        $stores = [];
-        foreach ($this->storeManager->getStores() as $store) {
-            $localeCode = $this->scopeConfig->getValue(
-                StoreDataEnum::CONFIG_LOCALE_CODE_PATH,
-                ScopeInterface::SCOPE_STORE,
-                $store->getId()
-            );
+        $localeCode = $this->scopeConfig->getValue(
+            StoreDataEnum::CONFIG_LOCALE_CODE_PATH,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
 
-            $stores[strstr($localeCode, '_', true)][] = $store->getId();
-        }
-
-        return $stores;
+        return strstr($localeCode, '_', true);
     }
 }

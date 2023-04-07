@@ -29,25 +29,26 @@ class ReviewInvitation
     /**
      * ProductReview constructor
      *
-     * @param TrustMateRestApi $apiService
+     * @param TrustMateRestApi    $apiService
      * @param SerializerInterface $serializerInterface
      */
     public function __construct(
         TrustMateRestApi    $apiService,
         SerializerInterface $serializerInterface
     ) {
-        $this->apiService = $apiService;
+        $this->apiService          = $apiService;
         $this->serializerInterface = $serializerInterface;
     }
 
     /**
      * @param array $data
+     * @param int   $storeId
      *
      * @return array|bool|float|int|string|null
      */
-    public function sendRequest(array $data)
+    public function sendRequest(array $data, int $storeId)
     {
-        $response = $this->create($data);
+        $response = $this->create($data, $storeId);
         if ($response->getStatusCode() !== 200) {
             return [
                 'status' => false,
@@ -56,6 +57,7 @@ class ReviewInvitation
         }
 
         $bodyContent = $response->getBody()->getContents();
+
         return $this->serializerInterface->unserialize($bodyContent);
     }
 
@@ -63,15 +65,17 @@ class ReviewInvitation
      * Create invitation
      *
      * @param array $data
+     * @param int   $storeId
      *
      * @return Response
      */
-    protected function create(array $data): Response
+    protected function create(array $data, int $storeId): Response
     {
         return $this->apiService->doRequest(
-                TrustMateApiEnum::INVITATION_ENDPOINT,
-                $data,
-                Request::HTTP_METHOD_POST
-            );
+            $storeId,
+            TrustMateApiEnum::INVITATION_ENDPOINT,
+            $data,
+            Request::HTTP_METHOD_POST
+        );
     }
 }

@@ -53,25 +53,26 @@ class TrustMateRestApi
     /**
      * API request with provided params
      *
+     * @param int    $storeId
      * @param string $endpoint
-     * @param array $data
+     * @param array  $data
      * @param string $method
      *
      * @return Response
      */
     public function doRequest(
+        int $storeId,
         string $endpoint,
         array $data = [],
         string $method = Request::HTTP_METHOD_GET
-    ): Response
-    {
+    ): Response {
         $client = $this->clientFactory->create([
             'config' => [
-                'base_uri' => ($this->configData->isSandboxEnabled())
+                'base_uri' => ($this->configData->isSandboxEnabled($storeId))
                     ? TrustMateApiEnum::SANDBOX_URL
                     : TrustMateApiEnum::PRODUCTION_URL,
                 'headers' => [
-                    'x-api-key' => $this->configData->getApiKey(),
+                    'x-api-key' => $this->configData->getApiKey($storeId),
                     'Accept' => 'application/json"'
                 ]
             ]

@@ -21,11 +21,7 @@
 
     <!-- DECLARE PREFERENCES -->
 
-    <preference for="Magento\Review\Block\Product\Review" type="TrustMate\Opinions\Block\Product\Review" />
-    <preference for="Magento\Review\Block\Product\ReviewRenderer" type="TrustMate\Opinions\Block\Product\ReviewRenderer" />
     <preference for="Magento\Review\Block\Product\View\ListView" type="TrustMate\Opinions\Block\Product\View\ListView" />
-    <preference for="Magento\Review\Model\ResourceModel\Review" type="TrustMate\Opinions\Model\ResourceModel\Review" />
-
     <preference for="TrustMate\Opinions\Api\Data\ProductReviewInterface" type="TrustMate\Opinions\Model\ProductReview"/>
     <preference for="TrustMate\Opinions\Api\Data\ProductReviewSearchResultInterface" type="Magento\Framework\Api\SearchResults"/>
     <preference for="TrustMate\Opinions\Api\ProductReviewRepositoryInterface" type="TrustMate\Opinions\Model\ProductReviewRepository"/>
@@ -81,9 +77,15 @@
 
     <!-- END OF DECLARE LOGGER -->
 
-    <type name="Magento\Review\Model\ResourceModel\Review\Product\Collection">
+    <type name="Magento\Review\Model\ResourceModel\Review\Collection">
         <plugin name="trustmate_after_load_product_items_review_collection"
-                type="TrustMate\Opinions\Plugin\Magento\Review\Product\Collection"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Collection"
+                sortOrder="20" disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Api\ShipOrderInterface">
+        <plugin name="trustmate_after_create_shipment"
+                type="TrustMate\Opinions\Plugin\Magento\Sales\Api\ShipOrder"
                 sortOrder="20" disabled="false"/>
     </type>
 </config>

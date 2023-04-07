@@ -14,23 +14,13 @@
             "original_body": true,
             "order_increment_id": true,
             "gtin_code": true,
-            "mpn_code": true
+            "mpn_code": true,
+            "status": true,
+            "store_id": true
         },
         "constraint": {
+            "TRUSTMATE_PRODUCT_OPINIONS_STORE_ID_STORE_STORE_ID": true,
             "PRIMARY": true
-        }
-    },
-    "review": {
-        "column": {
-            "trustmate_review_id": true,
-            "review_store_id": true
-        },
-        "index": {
-            "REVIEW_TRUSTMATE_REVIEW_ID": true,
-            "REVIEW_REVIEW_STORE_ID": true
-        },
-        "constraint": {
-            "REVIEW_REVIEW_STORE_ID_STORE_STORE_ID": true
         }
     },
     "sales_order": {

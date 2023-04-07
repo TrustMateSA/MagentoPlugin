@@ -28,30 +28,27 @@ class ProductReview
     /**
      * ProductReview constructor
      *
-     * @param TrustMateRestApi $apiService
+     * @param TrustMateRestApi    $apiService
      * @param SerializerInterface $serializerInterface
      */
     public function __construct(
         TrustMateRestApi    $apiService,
         SerializerInterface $serializerInterface
     ) {
-        $this->apiService = $apiService;
+        $this->apiService          = $apiService;
         $this->serializerInterface = $serializerInterface;
     }
 
     /**
      * @param array $data
-     * @param bool $translation
+     * @param int   $storeId
+     * @param bool  $translation
      *
      * @return array|bool|float|int|string|null
      */
-    public function sendRequest(array $data, bool $translation = false)
+    public function sendRequest(array $data, int $storeId, bool $translation = false)
     {
-        if ($translation) {
-            $response = $this->getTranslations($data);
-        } else {
-            $response = $this->getReview($data);
-        }
+        $response = $this->getReview($data, $storeId, $translation);
 
         if ($response->getStatusCode() !== 200) {
             return [
@@ -67,29 +64,18 @@ class ProductReview
      * Get review with original language
      *
      * @param array $data
+     * @param int   $storeId
+     * @param bool  $translation
      *
      * @return Response
      */
-    protected function getReview(array $data): Response
+    protected function getReview(array $data, int $storeId, bool $translation = false): Response
     {
         return $this->apiService->doRequest(
-                TrustMateApiEnum::REVIEW_ENDPOINT,
-                $data
-            );
+            $storeId,
+            (!$translation) ? TrustMateApiEnum::REVIEW_ENDPOINT : TrustMateApiEnum::REVIEW_TRANSLATION_ENDPOINT,
+            $data
+        );
     }
 
-    /**
-     * Get translations for review
-     *
-     * @param array $data
-     *
-     * @return Response
-     */
-    protected function getTranslations(array $data): Response
-    {
-        return $this->apiService->doRequest(
-                TrustMateApiEnum::REVIEW_TRANSLATION_ENDPOINT,
-                $data
-            );
-    }
 }

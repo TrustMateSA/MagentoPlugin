@@ -98,7 +98,7 @@ class Submit implements ObserverInterface
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::PLACE_ORDER_EVENT
         ) {
             $order          = $observer->getEvent()->getOrder();
-            $data           = [];
+            $storeId = (int)$this->storeManager->getStore()->getId();
             $invitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
@@ -108,7 +108,7 @@ class Submit implements ObserverInterface
             ];
 
             $data['body'] = $this->serializerInterface->serialize($invitationData);
-            $response     = $this->reviewInvitation->sendRequest($data);
+            $response     = $this->reviewInvitation->sendRequest($data, $storeId);
             if (isset($response['status'])) {
                 $this->logger->error($response['message']);
             }
@@ -141,7 +141,7 @@ class Submit implements ObserverInterface
                 }
 
                 $data['body'] = $this->serializerInterface->serialize($invitationData);
-                $response     = $this->reviewInvitation->sendRequest($data);
+                $response     = $this->reviewInvitation->sendRequest($data, $storeId);
                 if (isset($response['status'])) {
                     $this->logger->error($response['message']);
                 }

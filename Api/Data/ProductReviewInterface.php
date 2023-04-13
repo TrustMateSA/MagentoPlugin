@@ -66,7 +66,7 @@ interface ProductReviewInterface extends ExtensibleDataInterface
     /**
      * @return int|null
      */
-    public function getGrade(): ?int;
+    public function getGrade(): ?string;
 
     /**
      * @param $grade
@@ -85,7 +85,7 @@ interface ProductReviewInterface extends ExtensibleDataInterface
      *
      * @return ProductReviewInterface|null
      */
-    public function setAuthorEamil($email): ?ProductReviewInterface;
+    public function setAuthorEmail($email): ?ProductReviewInterface;
 
     /**
      * @return string|null

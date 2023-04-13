@@ -12,12 +12,14 @@ use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TrustMate\Opinions\Model\Review as ReviewModel;
 use TrustMate\Opinions\Model\Store as StoreModel;
+use TrustMate\Opinions\Service\Api\Query;
 use TrustMate\Opinions\Service\Review as ReviewService;
 
 /**
@@ -31,7 +33,7 @@ class ImportReviews extends Command
     /**
      * @var State
      */
-    protected $state;
+    private $state;
 
     /**
      * @var ReviewModel
@@ -49,23 +51,39 @@ class ImportReviews extends Command
     private $storeModel;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var Query
+     */
+    private $query;
+
+    /**
      * ImportReviews constructor.
      *
-     * @param State $state
-     * @param ReviewModel $reviewModel
-     * @param ReviewService $reviewService
-     * @param StoreModel $storeModel
+     * @param State                 $state
+     * @param ReviewModel           $reviewModel
+     * @param ReviewService         $reviewService
+     * @param StoreModel            $storeModel
+     * @param StoreManagerInterface $storeManager
+     * @param Query                 $query
      */
     public function __construct(
         State         $state,
         ReviewModel   $reviewModel,
         ReviewService $reviewService,
-        StoreModel    $storeModel
+        StoreModel    $storeModel,
+        StoreManagerInterface $storeManager,
+        Query $query
     ) {
         $this->state = $state;
         $this->reviewModel = $reviewModel;
         $this->reviewService = $reviewService;
         $this->storeModel = $storeModel;
+        $this->storeManager = $storeManager;
+        $this->query = $query;
         parent::__construct();
     }
 
@@ -99,23 +117,30 @@ class ImportReviews extends Command
     {
         $this->state->setAreaCode(Area::AREA_ADMINHTML);
         $output->writeln('<info>Start importing</info>');
-        $data['query'] = [
-            "start" => $this->reviewModel->getLatestUpdatedDate(),
-            'per_page' => 1000,
-            'page' => 1,
-            'sort' => 'updatedAt'
-        ];
 
-        $this->reviewService->add($data);
+        foreach ($this->getAllStores() as $store)
+        {
+            $storeId = (int)$store->getId();
+            $data = $this->query->prepare($storeId);
+            $this->reviewService->add($data, $storeId);
 
-        if ($input->getOption('translation')) {
-            foreach ($this->storeModel->getStoreLocales() as $languageCode => $storeId) {
-                $data['query']['start'] = $this->reviewModel->getLatestUpdatedDate(true);
-                $data['query']['language'] = $languageCode;
-                $this->reviewService->addTranslation($data);
+            if ($input->getOption('translation')) {
+                $languageCode = $this->storeModel->getStoreLocales($storeId);
+                $data = $this->query->prepare($storeId, $languageCode, true);
+                $this->reviewService->add($data, $storeId, true);
             }
         }
 
         $output->writeln('<info>Finish importing</info>');
+    }
+
+    /**
+     * Get all stores
+     *
+     * @return array
+     */
+    private function getAllStores(): array
+    {
+        return $this->storeManager->getStores();
     }
 }

@@ -12,18 +12,10 @@ use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
-use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Review\Model\ResourceModel\Review as SourceReviewResource;
-use Magento\Review\Model\ResourceModel\Review\CollectionFactory;
-use Magento\Review\Model\Review as MagentoReview;
-use Magento\Review\Model\ReviewFactory;
 use TrustMate\Opinions\Api\ProductReviewRepositoryInterface;
-use TrustMate\Opinions\Enum\ReviewDataEnum;
 use TrustMate\Opinions\Enum\TrustMateDataEnum;
-use TrustMate\Opinions\Model\Option as TrustMateOption;
-use TrustMate\Opinions\Model\Rating as TrustMateRating;
 
 class Review
 {
@@ -53,112 +45,82 @@ class Review
     private $sortOrder;
 
     /**
-     * @var ReviewFactory
-     */
-    private $reviewFactory;
-
-    /**
-     * @var SourceReviewResource
-     */
-    private $reviewResource;
-
-    /**
-     * @var Rating
-     */
-    private $rating;
-
-    /**
-     * @var Option
-     */
-    private $option;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $reviewCollection;
-
-    /**
      * @param ProductReviewRepositoryInterface $productReviewRepositoryInterface
      * @param FilterBuilder                    $filterBuilder
      * @param FilterGroupBuilder               $filterGroupBuilder
      * @param SearchCriteriaBuilder            $searchCriteriaBuilder
      * @param SortOrder                        $sortOrder
-     * @param TrustMateRating                  $rating
-     * @param TrustMateOption                  $option
-     * @param ReviewFactory                    $reviewFactory
-     * @param SourceReviewResource             $reviewResource
-     * @param CollectionFactory                $reviewCollection
      */
     public function __construct(
         ProductReviewRepositoryInterface $productReviewRepositoryInterface,
         FilterBuilder                    $filterBuilder,
         FilterGroupBuilder               $filterGroupBuilder,
         SearchCriteriaBuilder            $searchCriteriaBuilder,
-        SortOrder                        $sortOrder,
-        Rating                           $rating,
-        Option                           $option,
-        ReviewFactory                    $reviewFactory,
-        SourceReviewResource             $reviewResource,
-        Collectionfactory                $reviewCollection
+        SortOrder                        $sortOrder
     ) {
         $this->productReviewRepositoryInterface = $productReviewRepositoryInterface;
         $this->filterBuilder                    = $filterBuilder;
         $this->filterGroupBuilder               = $filterGroupBuilder;
         $this->searchCriteriaBuilder            = $searchCriteriaBuilder;
         $this->sortOrder                        = $sortOrder;
-        $this->rating                           = $rating;
-        $this->option                           = $option;
-        $this->reviewFactory                    = $reviewFactory;
-        $this->reviewResource                   = $reviewResource;
-        $this->reviewCollection                 = $reviewCollection;
     }
 
     /**
      * Get latest review updated date
      *
+     * @param int  $storeId
      * @param bool $translation
      *
      * @return null|string
      * @throws InputException
      * @throws LocalizedException
      */
-    public function getLatestUpdatedDate(bool $translation = false): ?string
+    public function getLatestUpdatedDate(int $storeId, bool $translation = false): ?string
     {
-        $updatedAtOrder = $this->sortOrder
+        $updatedAtOrder   = $this->sortOrder
             ->setField('updated_at')
             ->setDirection(SortOrder::SORT_DESC);
+        $storeIdCondition = $this->filterBuilder
+            ->setField('store_id')
+            ->setConditionType('eq')
+            ->setValue($storeId)
+            ->create();
+        $storeIdFilterGroup = $this->filterGroupBuilder
+            ->addFilter($storeIdCondition)
+            ->create();
 
         if ($translation) {
-            $notNullCondition  = $this->filterBuilder
+            $notNullCondition        = $this->filterBuilder
                 ->setField('original_body')
                 ->setConditionType('notnull')
                 ->setValue(1)
                 ->create();
-            $notNullFilterGroup = $this->filterGroupBuilder
+            $translationsFilterGroup = $this->filterGroupBuilder
                 ->addFilter($notNullCondition)
                 ->create();
         } else {
-            $nullCondition  = $this->filterBuilder
+            $nullCondition                  = $this->filterBuilder
                 ->setField('original_body')
                 ->setConditionType('null')
                 ->setValue(0)
                 ->create();
-            $nullFilterGroup = $this->filterGroupBuilder
+            $withoutTranslationsFilterGroup = $this->filterGroupBuilder
                 ->addFilter($nullCondition)
                 ->create();
         }
 
-        $filtersGroup = isset($nullCondition) ? $nullFilterGroup : $notNullFilterGroup;
+        $filtersGroup = isset($nullCondition) ? $withoutTranslationsFilterGroup : $translationsFilterGroup;
 
         $searchCriteria = $this->searchCriteriaBuilder
-            ->setFilterGroups([$filtersGroup])
+            ->setFilterGroups([$filtersGroup, $storeIdFilterGroup])
             ->setPageSize(1)
             ->setSortOrders([$updatedAtOrder])
             ->create();
 
-        $review = $this->productReviewRepositoryInterface->getList($searchCriteria)->getItems();
+        $productReviews = $this->productReviewRepositoryInterface->getList($searchCriteria);
+        $reviewList = $productReviews->getItems();
 
-        return empty($review) ? '1990-01-01 12:00:00' : reset($review)->getUpdatedAt();
+        return empty($reviewList) ? '1990-01-01 12:00:00' : reset($reviewList)->getUpdatedAt();
     }
 
     /**
@@ -173,7 +135,7 @@ class Review
      */
     public function checkIfExists(string $publicIdentifier, ?string $originalBody, bool $translation = false): ?string
     {
-        $publicIdentifierFilter = $this->filterBuilder
+        $publicIdentifierFilter      = $this->filterBuilder
             ->setField(TrustMateDataEnum::PUBLIC_IDENTIFIER_COLUMN)
             ->setConditionType(TrustMateDataEnum::CONDITION_EQUAL)
             ->setValue($publicIdentifier)
@@ -183,7 +145,7 @@ class Review
             ->create();
 
         if ($translation) {
-            $originalBodyFilter = $this->filterBuilder
+            $originalBodyFilter      = $this->filterBuilder
                 ->setField('original_body')
                 ->setConditionType(TrustMateDataEnum::CONDITION_EQUAL)
                 ->setValue($originalBody)
@@ -204,51 +166,5 @@ class Review
         return empty($review)
             ? null
             : reset($review)->getId();
-    }
-
-    /**
-     * Save review as magento review
-     *
-     * @param array      $data
-     * @param string|int $store
-     *
-     * @return void
-     * @throws AlreadyExistsException
-     */
-    public function saveReviewToMagento(array $data, $store)
-    {
-        $reviewModel = $this->reviewFactory->create();
-
-        $data['entity_id'] = $reviewModel->getEntityIdByCode(MagentoReview::ENTITY_PRODUCT_CODE);
-        $data['status_id'] = MagentoReview::STATUS_APPROVED;
-        $data['store_id']  = $store;
-        $data['stores']    = $store;
-
-        $reviewId = $this->reviewCollection->create()
-            ->addFieldToFilter(ReviewDataEnum::TRUSTMATE_REVIEW_ID_COLUMN, ['eq' => $data[ReviewDataEnum::TRUSTMATE_REVIEW_ID_COLUMN]])
-            ->addFieldToFilter(ReviewDataEnum::REVIEW_STORE_ID_COLUMN, ['eq' => $store])
-            ->getFirstItem()
-            ->getReviewId();
-
-        $data['review_id'] = $reviewId;
-        $reviewModel->setData($data);
-        $this->reviewResource->save($reviewModel);
-
-        if ($reviewModel->getId()) {
-            $trustMateRating = $this->rating->getRatingByCode('TrustMate');
-            $optionData      = $this->option->getOptionByRatingIdAndValue(
-                $trustMateRating['rating_id'],
-                $data['grade']
-            );
-
-            $this->rating->saveRating(
-                $trustMateRating['rating_id'],
-                $optionData['option_id'],
-                $data['entity_pk_value'],
-                $reviewModel->getId()
-            );
-
-            $reviewModel->aggregate();
-        }
     }
 }

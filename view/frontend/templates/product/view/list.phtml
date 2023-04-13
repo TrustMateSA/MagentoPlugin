@@ -9,16 +9,11 @@ use TrustMate\Opinions\Block\Product\View\ListView;
  */
 
 $reviewsCollection = $block->getReviewsCollection();
-$_items            = null;
-if ($reviewsCollection) {
-    $_items = $block->getReviewsCollection()->getItems();
-}
-
+$items = $block->getReviewsCollection()->getItems();
 $format = $block->getDateFormat() ?: IntlDateFormatter::SHORT;
 
-if ($_items !== null):
-    if (count($_items)):
-        ?>
+if ($items !== null):
+    if (count($items)): ?>
         <div class="block review-list" id="customer-reviews">
             <div class="block-title">
                 <strong>
@@ -30,25 +25,42 @@ if ($_items !== null):
                     <?= $block->getChildHtml('toolbar') ?>
                 </div>
                 <ol class="items review-items">
-                    <?php foreach ($_items as $_review):
-                        if ($_review->getStatus() === '1' || $_review->getStatus() === null) : ?>
-                            <li class="item review-item <?php if ($block->isTrustMateOpinion($_review)): ?> trustmate-opinion <?php endif; ?>"
+                    <?php foreach ($items as $review):
+                        if ($review->getStatus() === '1' || $review->getStatus() === null) : ?>
+                            <li class="item review-item <?php if ($block->isTrustMateOpinion($review)): ?> trustmate-opinion <?php endif; ?>"
                                 itemscope itemprop="review" itemtype="http://schema.org/Review">
-                                <?php if ($block->isTrustMateOpinion($_review)):
-                                    $imageName = (strtolower($_review->getLanguage()) === 'pl')
+                                <?php if ($block->isTrustMateOpinion($review)):
+                                    $imageName = (strtolower($review->getLanguage()) === 'pl')
                                         ? 'trustmate_confirmed_pl.png'
                                         : 'trustmate_confirmed_en.png';
                                     ?>
                                     <img class="trustmate-badge"
                                          src="<?= $block->getViewFileUrl('TrustMate_Opinions/images/' . $imageName); ?>"
-                                         alt="<?= $escaper->escapeHtml($_review->getTitle()) ?>">
+                                         alt="<?= $escaper->escapeHtml($review->getTitle()) ?>">
                                 <?php endif; ?>
                                 <div class="review-title"
-                                     itemprop="name"><?= $escaper->escapeHtml($_review->getTitle()) ?></div>
-                                <?php if (is_countable($_review->getRatingVotes())) :
-                                    if (count($_review->getRatingVotes())): ?>
+                                     itemprop="name"><?= $escaper->escapeHtml($review->getTitle()) ?></div>
+                                <?php if ($block->isTrustMateOpinion($review)): ?>
+                                    <div class="rating-summary item" itemprop="reviewRating" itemscope
+                                         itemtype="http://schema.org/Rating">
+                                        <div class="rating-result" title="
+                                                    <?= /* @escapeNotVerified */ $review->getPercent() ?>%">
+                                            <meta itemprop="worstRating" content="1"/>
+                                            <meta itemprop="bestRating" content="100"/>
+                                            <span style="width:
+                                            <?= /* @escapeNotVerified */ $review->getPercent() ?>%">
+                                                            <span itemprop="ratingValue">
+                                                                <?= /* @escapeNotVerified */
+                                                                $review->getPercent() ?>%
+                                                            </span>
+                                                        </span>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (is_countable($review->getRatingVotes())) :
+                                    if (count($review->getRatingVotes())): ?>
                                         <div class="review-ratings">
-                                            <?php foreach ($_review->getRatingVotes() as $_vote): ?>
+                                            <?php foreach ($review->getRatingVotes() as $_vote): ?>
                                                 <div class="rating-summary item" itemprop="reviewRating" itemscope
                                                      itemtype="http://schema.org/Rating">
                                                     <span class="label rating-label">
@@ -74,7 +86,7 @@ if ($_items !== null):
                                     <?php endif;
                                 endif; ?>
                                 <div class="review-content" itemprop="description">
-                                    <?= nl2br($escaper->escapeHtml($_review->getDetail())) ?>
+                                    <?= nl2br($escaper->escapeHtml($review->getDetail())) ?>
                                 </div>
                                 <div class="review-details">
                                     <p class="review-author">
@@ -83,7 +95,7 @@ if ($_items !== null):
                                         __('Review by') ?>
                                     </span>
                                         <strong class="review-details-value" itemprop="author">
-                                            <?= $escaper->escapeHtml($_review->getNickname()) ?>
+                                            <?= $escaper->escapeHtml($review->getNickname()) ?>
                                         </strong>
                                     </p>
                                     <p class="review-date">
@@ -91,9 +103,9 @@ if ($_items !== null):
                                             __('Posted on') ?></span>
                                         <time class="review-details-value" itemprop="datePublished" datetime="
                                     <?= /* @escapeNotVerified */
-                                        $block->formatDate($_review->getCreatedAt(), $format) ?>">
+                                        $block->formatDate($review->getCreatedAt(), $format) ?>">
                                             <?= /* @escapeNotVerified */
-                                            $block->formatDate($_review->getCreatedAt(), $format) ?>
+                                            $block->formatDate($review->getCreatedAt(), $format) ?>
                                         </time>
                                     </p>
                                 </div>

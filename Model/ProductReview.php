@@ -11,7 +11,6 @@ namespace TrustMate\Opinions\Model;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use TrustMate\Opinions\Api\Data\ProductReviewExtensionInterface;
 use TrustMate\Opinions\Api\Data\ProductReviewInterface;
-use TrustMate\Opinions\Api\Data\TrustMate;
 
 class ProductReview extends AbstractExtensibleModel implements ProductReviewInterface
 {
@@ -55,7 +54,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     /**
      * @inheirtDoc
      */
-    public function getGrade(): ?int
+    public function getGrade(): ?string
     {
         return $this->getData(self::GRADE);
     }
@@ -79,7 +78,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     /**
      * @inheirtDoc
      */
-    public function setAuthorEamil($email): ?ProductReviewInterface
+    public function setAuthorEmail($email): ?ProductReviewInterface
     {
         return $this->setData(self::AUTHOR_EMAIL, $email);
     }
@@ -151,7 +150,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     /**
      * @inheirtDoc
      */
-    public function getExtensionAttributes(): ?\TrustMate\Opinions\Api\Data\ProductReviewExtensionInterface
+    public function getExtensionAttributes(): ?ProductReviewExtensionInterface
     {
         return $this->_getExtensionAttributes();
     }
@@ -159,7 +158,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     /**
      * @inheirtDoc
      */
-    public function setExtensionAttributes(\TrustMate\Opinions\Api\Data\ProductReviewExtensionInterface $extensionAttributes): ProductReviewInterface
+    public function setExtensionAttributes(ProductReviewExtensionInterface $extensionAttributes): ProductReviewInterface
     {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

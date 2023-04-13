@@ -70,6 +70,7 @@ class Review
      * @param Logger                     $logger
      * @param ProductRepositoryInterface $productRepository
      * @param Data                       $config
+     * @param Store                      $store
      */
     public function __construct(
         ProductReview              $httpProductReview,
@@ -95,51 +96,7 @@ class Review
      * Add review
      *
      * @param array $preparedData
-     *
-     * @return void
-     * @throws AlreadyExistsException
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     */
-    public function add(array $preparedData)
-    {
-        $response = $this->httpProductReview->sendRequest($preparedData);
-        if (isset($response['status'])) {
-            $this->logger->error($response['message']);
-
-            return;
-        }
-
-        $this->save($response);
-    }
-
-    /**
-     * add review translation
-     *
-     * @param array $preparedData
-     *
-     * @return void
-     * @throws AlreadyExistsException
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     */
-    public function addTranslation(array $preparedData)
-    {
-        $response = $this->httpProductReview->sendRequest($preparedData, true);
-
-        if (isset($response['status'])) {
-            $this->logger->error($response['message']);
-
-            return;
-        }
-
-        $this->save($response, true);
-    }
-
-    /**
-     * Save review
-     *
-     * @param array $reviews
+     * @param int   $storeId
      * @param bool  $translation
      *
      * @return void
@@ -147,7 +104,30 @@ class Review
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function save(array $reviews, bool $translation = false)
+    public function add(array $preparedData, int $storeId, bool $translation = false)
+    {
+        $response = $this->httpProductReview->sendRequest($preparedData, $storeId, $translation);
+        if (isset($response['status'])) {
+            $this->logger->error($response['message']);
+
+            return;
+        }
+
+        $this->save($response, $storeId, $translation);
+    }
+
+    /**
+     * Save review
+     *
+     * @param array $reviews
+     * @param int   $storeId
+     * @param bool  $translation
+     *
+     * @return void
+     * @throws AlreadyExistsException
+     * @throws LocalizedException
+     */
+    private function save(array $reviews, int $storeId, bool $translation = false)
     {
         foreach ($reviews['items'] as $item) {
             $originalBody  = (!isset($item['originalBody']) || !$item['originalBody']) ? null : $item['originalBody'];
@@ -176,26 +156,13 @@ class Review
                 'order_increment_id' => $item['orderIdentifier'],
                 'gtin_code' => $item['product']['gtin'],
                 'mpn_code' => $item['product']['mpn'],
-                'status' => $item['status']
+                'status' => $item['status'],
+                'store_id' => $storeId
             ];
 
             $productReview = $this->productReview->create();
             $productReview->setData($data);
             $this->productReviewResource->save($productReview);
-
-            foreach ($this->store->getStoreLocales()[$data['language']] as $storeLocale) {
-                $reviewData = [
-                    'trustmate_review_id' => $productReview->getId(),
-                    'title' => 'Opinia z TrustMate',
-                    'detail' => $data['body'],
-                    'nickname' => $data['author_name'],
-                    'grade' => $data['grade'],
-                    'entity_pk_value' => $data['product'],
-                    'review_store_id' => $storeLocale
-                ];
-
-                $this->reviewModel->saveReviewToMagento($reviewData, $storeLocale);
-            }
         }
     }
 }

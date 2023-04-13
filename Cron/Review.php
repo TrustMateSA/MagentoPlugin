@@ -12,8 +12,10 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
 use TrustMate\Opinions\Model\Review as ReviewModel;
 use TrustMate\Opinions\Model\Store as StoreModel;
+use TrustMate\Opinions\Service\Api\Query;
 use TrustMate\Opinions\Service\Review as ReviewService;
 
 class Review
@@ -34,18 +36,34 @@ class Review
     private $storeModel;
 
     /**
-     * @param ReviewModel $reviewModel
-     * @param ReviewService $reviewService
-     * @param StoreModel $storeModel
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var Query
+     */
+    private $query;
+
+    /**
+     * @param ReviewModel           $reviewModel
+     * @param ReviewService         $reviewService
+     * @param StoreModel            $storeModel
+     * @param StoreManagerInterface $storeManager
+     * @param Query                 $query
      */
     public function __construct(
-        ReviewModel   $reviewModel,
-        ReviewService $reviewService,
-        StoreModel    $storeModel
+        ReviewModel           $reviewModel,
+        ReviewService         $reviewService,
+        StoreModel            $storeModel,
+        StoreManagerInterface $storeManager,
+        Query                 $query
     ) {
-        $this->reviewModel = $reviewModel;
+        $this->reviewModel   = $reviewModel;
         $this->reviewService = $reviewService;
-        $this->storeModel = $storeModel;
+        $this->storeModel    = $storeModel;
+        $this->storeManager  = $storeManager;
+        $this->query         = $query;
     }
 
     /**
@@ -59,36 +77,23 @@ class Review
      */
     public function execute()
     {
-        $this->reviewService->add($this->prepareData());
-        foreach ($this->storeModel->getStoreLocales() as $languageCode => $storeId) {
-            $this->reviewService->addTranslation($this->prepareData(true, $languageCode));
-        }
+        foreach ($this->getAllStores() as $store) {
+            $storeId      = (int)$store->getId();
+            $languageCode = $this->storeModel->getStoreLocales($storeId);
+            $data         = $this->query->prepare($storeId, $languageCode, true);
 
+            $this->reviewService->add($data, $storeId);
+            $this->reviewService->add($data, $storeId, true);
+        }
     }
 
     /**
-     * Return query data for request
-     *
-     * @param bool $addLanguage
-     * @param string|null $language
+     * Get all stores
      *
      * @return array
-     * @throws InputException
-     * @throws LocalizedException
      */
-    private function prepareData(bool $addLanguage = false, ?string $language = null): array
+    private function getAllStores(): array
     {
-        $preparedData['query'] = [
-            'start' => $this->reviewModel->getLatestUpdatedDate($addLanguage),
-            'per_page' => 1000,
-            'page' => 1,
-            'sort' => 'updatedAt'
-        ];
-
-        if ($addLanguage) {
-            $preparedData['query']['language'] = $language;
-        }
-
-        return $preparedData;
+        return $this->storeManager->getStores();
     }
 }

@@ -79,10 +79,11 @@ class Review
     {
         foreach ($this->getAllStores() as $store) {
             $storeId      = (int)$store->getId();
+            $data         = $this->query->prepare($storeId);
+            $this->reviewService->add($data, $storeId);
+
             $languageCode = $this->storeModel->getStoreLocales($storeId);
             $data         = $this->query->prepare($storeId, $languageCode, true);
-
-            $this->reviewService->add($data, $storeId);
             $this->reviewService->add($data, $storeId, true);
         }
     }

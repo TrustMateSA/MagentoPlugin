@@ -23,6 +23,22 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 # Upgrading
 
 
+## To version 3.0.0
+
+BEFORE UPDATE:
+
+Due to changed review storage structure, reviews from TrustMate need to re-downloaded. Remove everything from `trustmate_product_opinions` table along with references:
+
+```
+DELETE FROM review WHERE trustmate_review_id IN (SELECT id FROM trustmate_product_opinions);
+DELETE FROM trustmate_product_opinions;
+```
+
+AFTER UPDATE:
+
+No action is required, reviews will download periodically (1000 in single job run). If you want to speed up this process temporarly change cron job in module to be run more often, avoiding overlapping).
+
+
 ## To version 2.1.0
 
 * Due to bug in some older versions, if your products are identified in TrustMate using database identifier instead of SKU - please use new configuration option to keep this behaviour. Without it you may notice that new orders create brand new products on TrustMate side ignoring all existing ones.
@@ -32,6 +48,12 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
 #### Change log
+
+##### 3.0.0. (2023-??-??)
+
+- Internal review storage method was redesigned and TrustMate reviews are now decoupled from native Magento reviews. They are still rendering the same way.
+- Abandoned matching store views by language, single store view should be connected to single TrustMate account using separate API key
+- Added better support for "After create shipment" status - now also works when shipment is created by external tool.
 
 ##### 2.1.6 (2023-02-15)
 - Reviews which became unpublished are now soft-deleted on Magento side

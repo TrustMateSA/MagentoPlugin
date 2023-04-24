@@ -114,7 +114,7 @@ class Save extends MagentoShippingSave
                 'send_to' => $order->getCustomerEmail(),
                 'order_number' => $order->getIncrementId(),
                 'language' => strstr($this->resolver->getLocale(), '_', true),
-                'source_type' => 'magento2.1'
+                'source_type' => 'magento3.0'
             ];
 
             $data['body'] = $this->serializerInterface->serialize($invitationData);

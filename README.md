@@ -51,7 +51,7 @@ No action is required, reviews will download periodically (1000 in single job ru
 
 ##### 3.0.0. (2023-04-26)
 
-- Internal review storage method was redesigned and TrustMate reviews are now decoupled from native Magento reviews. They are still rendering the same way.
+- [BREAKING CHANGE] Internal review storage method was redesigned and TrustMate reviews are now decoupled from native Magento reviews. They are still rendering the same way.
 - Abandoned matching Store Views by language, single Store View should be connected to single TrustMate account using separate API key.
 - Added better support for "After create shipment" status - now also works when shipment is created by external tool.
 

@@ -27,7 +27,7 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 
 BEFORE UPDATE:
 
-Due to changed review storage structure, reviews from TrustMate need to re-downloaded. Remove everything from `trustmate_product_opinions` table along with references:
+Due to changed review storage structure, reviews from TrustMate need to be re-downloaded. Remove everything from `trustmate_product_opinions` table along with references:
 
 ```
 DELETE FROM review WHERE trustmate_review_id IN (SELECT id FROM trustmate_product_opinions);
@@ -36,7 +36,7 @@ DELETE FROM trustmate_product_opinions;
 
 AFTER UPDATE:
 
-No action is required, reviews will download periodically (1000 in single job run). If you want to speed up this process temporarly change cron job in module to be run more often, avoiding overlapping).
+No action is required, reviews will download periodically (1000 in single job run). If you want to speed up this process - temporarly change cron job in module to be run more often, avoiding overlapping.
 
 
 ## To version 2.1.0
@@ -49,10 +49,10 @@ No action is required, reviews will download periodically (1000 in single job ru
 
 #### Change log
 
-##### 3.0.0. (2023-??-??)
+##### 3.0.0. (2023-04-26)
 
 - Internal review storage method was redesigned and TrustMate reviews are now decoupled from native Magento reviews. They are still rendering the same way.
-- Abandoned matching store views by language, single store view should be connected to single TrustMate account using separate API key
+- Abandoned matching Store Views by language, single Store View should be connected to single TrustMate account using separate API key.
 - Added better support for "After create shipment" status - now also works when shipment is created by external tool.
 
 ##### 2.1.6 (2023-02-15)

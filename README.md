@@ -36,7 +36,13 @@ DELETE FROM trustmate_product_opinions;
 
 AFTER UPDATE:
 
-No action is required, reviews will download periodically (1000 in single job run). If you want to speed up this process - temporarly change cron job in module to be run more often, avoiding overlapping.
+No action is required, reviews will download periodically (1000 in single job run). If you want to speed up this process - temporarly change cron job in module to be run more often, avoiding overlapping or download reviews manually using:
+
+
+```
+php bin/magento trustmate:import:opinions
+
+```
 
 
 ## To version 2.1.0
@@ -49,11 +55,12 @@ No action is required, reviews will download periodically (1000 in single job ru
 
 #### Change log
 
-##### 3.0.0 (2023-04-26)
+##### 3.0.0 (2023-04-27)
 
 - [BREAKING CHANGE] Internal review storage method was redesigned and TrustMate reviews are now decoupled from native Magento reviews. They are still rendering the same way.
 - Abandoned matching Store Views by language, single Store View should be connected to single TrustMate account using separate API key.
 - Added better support for "After create shipment" status - now also works when shipment is created by external tool.
+- Better support for review sharing (TrustMate feature)
 
 ##### 2.1.6 (2023-02-15)
 - Reviews which became unpublished are now soft-deleted on Magento side

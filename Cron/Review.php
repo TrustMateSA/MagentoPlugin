@@ -82,9 +82,9 @@ class Review
             $data         = $this->query->prepare($storeId);
             $this->reviewService->add($data, $storeId);
 
-            $languageCode = $this->storeModel->getStoreLocales($storeId);
-            $data         = $this->query->prepare($storeId, $languageCode, true);
-            $this->reviewService->add($data, $storeId, true);
+            // $languageCode = $this->storeModel->getStoreLocales($storeId);
+            // $data         = $this->query->prepare($storeId, $languageCode, true);
+            // $this->reviewService->add($data, $storeId, true);
         }
     }
 

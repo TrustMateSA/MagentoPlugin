@@ -44,7 +44,6 @@ php bin/magento trustmate:import:opinions
 
 ```
 
-
 ## To version 2.1.0
 
 * Due to bug in some older versions, if your products are identified in TrustMate using database identifier instead of SKU - please use new configuration option to keep this behaviour. Without it you may notice that new orders create brand new products on TrustMate side ignoring all existing ones.

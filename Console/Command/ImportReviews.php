@@ -124,14 +124,16 @@ class ImportReviews extends Command
             $data = $this->query->prepare($storeId);
             $this->reviewService->add($data, $storeId);
 
-            if ($input->getOption('translation')) {
-                $languageCode = $this->storeModel->getStoreLocales($storeId);
-                $data = $this->query->prepare($storeId, $languageCode, true);
-                $this->reviewService->add($data, $storeId, true);
-            }
+            // if ($input->getOption('translation')) {
+            //     $languageCode = $this->storeModel->getStoreLocales($storeId);
+            //     $data = $this->query->prepare($storeId, $languageCode, true);
+            //     $this->reviewService->add($data, $storeId, true);
+            // }
         }
 
         $output->writeln('<info>Finish importing</info>');
+
+        return Command::SUCCESS;
     }
 
     /**

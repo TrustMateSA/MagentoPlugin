@@ -46,6 +46,7 @@ class Query
             'per_page' => $perPage,
             'page' => $page,
             'sort' => 'updatedAt',
+            'include_shared' => 1,
         ];
 
         if ($translation) {

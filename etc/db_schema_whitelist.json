@@ -27,5 +27,18 @@
         "column": {
             "trustmate_agreement": true
         }
+    },
+    "trustmate_product_opinions_rating": {
+        "column": {
+            "id": true,
+            "review_sum": true,
+            "percent": true,
+            "store_id": true,
+            "product_id": true
+        },
+        "constraint": {
+            "TRUSTMATE_PRODUCT_OPINIONS_RATING_STORE_ID_STORE_STORE_ID": true,
+            "PRIMARY": true
+        }
     }
 }

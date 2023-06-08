@@ -82,12 +82,13 @@ class ProductReviewRepository implements ProductReviewRepositoryInterface
     public function getById(int $id): ProductReviewInterface
     {
         $productReview = $this->productReviewFactory->create();
-        $this->productReviewResourceModel->load($productReview, $id);
-        if ($productReview->getId()) {
+        $this->productReviewResourceModel->load($productReview, $id, 'id');
+
+        if (!$productReview->getId()) {
             throw new NoSuchEntityException(__('Unable to find Product Review with ID "%1"', $id));
         }
 
-        return $productReview->getData();
+        return $productReview;
     }
 
     /**

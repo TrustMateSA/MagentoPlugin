@@ -79,8 +79,12 @@ class Review
     {
         foreach ($this->getAllStores() as $store) {
             $storeId      = (int)$store->getId();
-            $data         = $this->query->prepare($storeId);
-            $this->reviewService->add($data, $storeId);
+            $query = $this->query->prepare($storeId);
+            $reviews = $this->reviewModel->getReviewsByApi($query, $storeId);
+            foreach ($reviews['items'] as $item) {
+                $reviewData = $this->reviewService->prepareDataToSave($item, $storeId);
+                $this->reviewModel->save($reviewData);
+            }
 
             // $languageCode = $this->storeModel->getStoreLocales($storeId);
             // $data         = $this->query->prepare($storeId, $languageCode, true);

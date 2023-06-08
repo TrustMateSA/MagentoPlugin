@@ -26,6 +26,8 @@
     <preference for="TrustMate\Opinions\Api\Data\ProductReviewSearchResultInterface" type="Magento\Framework\Api\SearchResults"/>
     <preference for="TrustMate\Opinions\Api\ProductReviewRepositoryInterface" type="TrustMate\Opinions\Model\ProductReviewRepository"/>
 
+    <preference for="Magento\Review\Model\ResourceModel\Review\Collection" type="TrustMate\Opinions\Model\ResourceModel\MagentoReview\Collection" />
+
     <!--  END OF DECLARE PREFERENCES -->
 
     <!-- DECLARE LOGGER -->
@@ -77,6 +79,7 @@
 
     <!-- END OF DECLARE LOGGER -->
 
+    <!-- DECLARE PLUGIN -->
     <type name="Magento\Review\Model\ResourceModel\Review\Collection">
         <plugin name="trustmate_after_load_product_items_review_collection"
                 type="TrustMate\Opinions\Plugin\Magento\Review\Collection"
@@ -88,4 +91,12 @@
                 type="TrustMate\Opinions\Plugin\Magento\Sales\Api\ShipOrder"
                 sortOrder="20" disabled="false"/>
     </type>
+
+    <type name="Magento\Review\Block\Product\ReviewRenderer">
+        <plugin name="trustmate_after_review_render"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Block\Product\ReviewRenderer"
+                sortOrder="1" disabled="false"/>
+    </type>
+
+    <!-- END OF DECLARE PLUGIN -->
 </config>

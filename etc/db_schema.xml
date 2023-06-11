@@ -26,6 +26,21 @@
         </constraint>
     </table>
 
+    <table name="trustmate_product_opinions_rating" resource="default" engine="innodb"
+           comment="TrustMate Product Opinions Rating">
+        <column xsi:type="int" name="id" unsigned="false" nullable="false" identity="true" comment="Rating ID"/>
+        <column xsi:type="int" name="review_sum" nullable="false" comment="Sum of reviews"/>
+        <column xsi:type="int" name="percent" nullable="false" comment="Percent of votes"/>
+        <column xsi:type="int" name="product_id" nullable="false" comment="Product ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false"
+                default="0" comment="Store ID"/>
+        <constraint xsi:type="foreign" referenceId="TRUSTMATE_PRODUCT_OPINIONS_RATING_STORE_ID_STORE_STORE_ID" table="trustmate_product_opinions_rating"
+                    column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="SET NULL"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+
     <table name="sales_order" resource="default">
         <column xsi:type="boolean" name="trustmate_agreement" nullable="true" comment="Order has TrustMate agreement"/>
     </table>

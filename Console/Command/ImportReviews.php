@@ -109,11 +109,11 @@ class ImportReviews extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return void
+     * @return int
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->state->setAreaCode(Area::AREA_ADMINHTML);
         $output->writeln('<info>Start importing</info>');
@@ -121,19 +121,24 @@ class ImportReviews extends Command
         foreach ($this->getAllStores() as $store)
         {
             $storeId = (int)$store->getId();
-            $data = $this->query->prepare($storeId);
-            $this->reviewService->add($data, $storeId);
+//            $languageCode = null;
+//            $translation = false;
+//            if ($input->getOption('translation')) {
+//                $languageCode = $this->storeModel->getStoreLocales($storeId);
+//                $translation = true;
+//            }
 
-            // if ($input->getOption('translation')) {
-            //     $languageCode = $this->storeModel->getStoreLocales($storeId);
-            //     $data = $this->query->prepare($storeId, $languageCode, true);
-            //     $this->reviewService->add($data, $storeId, true);
-            // }
+            $query = $this->query->prepare($storeId);
+            $reviews = $this->reviewModel->getReviewsByApi($query, $storeId);
+            foreach ($reviews['items'] as $item) {
+                $reviewData = $this->reviewService->prepareDataToSave($item, $storeId);
+                $this->reviewModel->save($reviewData);
+            }
         }
 
         $output->writeln('<info>Finish importing</info>');
 
-        return Command::SUCCESS;
+        return 1;
     }
 
     /**

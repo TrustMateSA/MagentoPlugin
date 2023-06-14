@@ -37,12 +37,12 @@ class ReviewRenderer
 
     /**
      * @param MagentoReviewRenderer $subject
-     * @param int $result
+     * @param int|null $result
      *
-     * @return int
+     * @return int|null
      * @throws NoSuchEntityException
      */
-    public function afterGetReviewsCount(MagentoReviewRenderer $subject, int $result): int
+    public function afterGetReviewsCount(MagentoReviewRenderer $subject, ?int $result): ?int
     {
         $this->getTrustmateRatingCollection((int)$subject->getProduct()->getId());
 
@@ -51,18 +51,20 @@ class ReviewRenderer
 
     /**
      * @param MagentoReviewRenderer $subject
-     * @param int $result
+     * @param int|null $result
      *
-     * @return int
+     * @return int|null
      * @throws NoSuchEntityException
      */
-    public function afterGetRatingSummary(MagentoReviewRenderer $subject, int $result): int
+    public function afterGetRatingSummary(MagentoReviewRenderer $subject, ?int $result): ?int
     {
         if (!$this->trustmateReviewRatingCollection) {
             $this->getTrustmateRatingCollection((int)$subject->getProduct()->getId());
         }
 
-        return (int)(($result + $this->trustmateReviewRatingCollection->getFirstItem()->getPercent()) / 2);
+        return (!$this->trustmateReviewRatingCollection->getFirstItem()->getPercent())
+            ? (int)$result
+            : (int)(($result + $this->trustmateReviewRatingCollection->getFirstItem()->getPercent()) / 2);
     }
 
     /**

@@ -81,11 +81,8 @@ class ListView extends ProductListView
         ]);
         $reviewsCollection->setOrder('created_at', 'DESC');
         $reviewsCollection->addRateVotes();
+
+
         return $reviewsCollection;
-    }
-
-    private function addVoteRating()
-    {
-
     }
 }

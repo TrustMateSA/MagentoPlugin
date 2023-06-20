@@ -27,6 +27,7 @@
     <preference for="TrustMate\Opinions\Api\ProductReviewRepositoryInterface" type="TrustMate\Opinions\Model\ProductReviewRepository"/>
 
     <preference for="Magento\Review\Model\ResourceModel\Review\Collection" type="TrustMate\Opinions\Model\ResourceModel\MagentoReview\Collection" />
+    <preference for="Magento\ReviewGraphQl\Model\Resolver\Product\Reviews" type="TrustMate\Opinions\Model\Resolver\Product\Reviews" />
 
     <!--  END OF DECLARE PREFERENCES -->
 
@@ -95,6 +96,24 @@
     <type name="Magento\Review\Block\Product\ReviewRenderer">
         <plugin name="trustmate_after_review_render"
                 type="TrustMate\Opinions\Plugin\Magento\Review\Block\Product\ReviewRenderer"
+                sortOrder="1" disabled="false"/>
+    </type>
+
+    <type name="Magento\ReviewGraphQl\Model\Resolver\Product\ReviewCount">
+        <plugin name="trustmate_after_review_count"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Resolver\Product\ReviewCount"
+                sortOrder="1" disabled="false"/>
+    </type>
+
+    <type name="Magento\ReviewGraphQl\Model\Resolver\Product\RatingSummary">
+        <plugin name="trustmate_after_review_rating_summary"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Resolver\Product\RatingSummary"
+                sortOrder="1" disabled="false"/>
+    </type>
+
+    <type name="Magento\ReviewGraphQl\Model\Resolver\Product\Review\AverageRating">
+        <plugin name="trustmate_after_review_average_rating"
+                type="TrustMate\Opinions\Plugin\Magento\Review\Resolver\Product\Review\AverageRating"
                 sortOrder="1" disabled="false"/>
     </type>
 

@@ -54,6 +54,10 @@ php bin/magento trustmate:import:opinions
 
 #### Change log
 
+##### 3.0.1 (2023-06-21)
+- Fixed issues with pagination
+- Fixed issues with average grades and review count per product
+
 ##### 3.0.0 (2023-04-27)
 
 - [BREAKING CHANGE] Internal review storage method was redesigned and TrustMate reviews are now decoupled from native Magento reviews. They are still rendering the same way.

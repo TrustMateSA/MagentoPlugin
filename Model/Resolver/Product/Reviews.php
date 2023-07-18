@@ -113,7 +113,18 @@ class Reviews implements ResolverInterface
         $trustmateCollection->getSelect()->reset('from');
         $trustmateCollection->getSelect()->from('trustmate_product_opinions');
         $trustmateCollection->getSelect()->reset('columns');
-        $trustmateCollection->getSelect()->columns(['id', 'id', 'store_id', 'author_email', 'body', 'author_name', 'created_at', 'product']);
+        $trustmateCollection->getSelect()->columns(
+            [
+                'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST(' . $magentoReviewsNumber . ' AS INT)'),
+                'id',
+                'store_id',
+                'author_email',
+                'body',
+                'author_name',
+                'created_at',
+                'product'
+            ]
+        );
         $trustmateCollection->getSelect()->reset('where');
         $trustmateCollection->addFieldToFilter('trustmate_product_opinions.store_id', ['eq' => $product->getStoreId()]);
         $trustmateCollection->addFieldToFilter('trustmate_product_opinions.product', ['eq' => $product->getId()]);

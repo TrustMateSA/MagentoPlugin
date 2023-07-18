@@ -25,6 +25,7 @@ use Magento\Review\Model\ResourceModel\Review\CollectionFactory as ReviewCollect
 use Magento\Review\Model\Review;
 use TrustMate\Opinions\Api\Data\ProductReviewInterface;
 use TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory;
+use Zend_Db_Expr;
 
 class ListView extends ProductListView
 {
@@ -94,6 +95,7 @@ class ListView extends ProductListView
             }
         }
 
+        $magentoReviewsNumber = $this->_reviewsCollection->getSize();
         $reviewsCollection = $this->_reviewsCollection;
         $trustmateCollection = $this->trustmateCollectionFactory->create();
         $reviewsCollection->getSelect()->reset('columns');
@@ -103,7 +105,18 @@ class ListView extends ProductListView
         $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
         $trustmateCollection->getSelect()->reset('columns');
-        $trustmateCollection->getSelect()->columns(['id', 'id', 'store_id', 'author_email', 'body', 'author_name', 'created_at', 'product']);
+        $trustmateCollection->getSelect()->columns(
+            [
+                'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST(' . $magentoReviewsNumber . ' AS INT)'),
+                'id',
+                'store_id',
+                'author_email',
+                'body',
+                'author_name',
+                'created_at',
+                'product'
+            ]
+        );
         $trustmateCollection->addFieldToFilter('store_id', ['eq' => $storeId]);
         $trustmateCollection->addFieldToFilter('product', ['eq' => $product->getId()]);
 

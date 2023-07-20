@@ -81,9 +81,11 @@ class Review
             $storeId      = (int)$store->getId();
             $query = $this->query->prepare($storeId);
             $reviews = $this->reviewModel->getReviewsByApi($query, $storeId);
-            foreach ($reviews['items'] as $item) {
-                $reviewData = $this->reviewService->prepareDataToSave($item, $storeId);
-                $this->reviewModel->save($reviewData);
+            if (isset($reviews['items'])) {
+                foreach ($reviews['items'] as $item) {
+                    $reviewData = $this->reviewService->prepareDataToSave($item, $storeId);
+                    $this->reviewModel->save($reviewData);
+                }
             }
 
             // $languageCode = $this->storeModel->getStoreLocales($storeId);

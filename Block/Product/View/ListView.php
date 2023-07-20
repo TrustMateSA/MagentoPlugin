@@ -9,30 +9,69 @@ declare(strict_types=1);
 namespace TrustMate\Opinions\Block\Product\View;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Block\Product\Context;
+use Magento\Catalog\Helper\Product;
+use Magento\Catalog\Model\ProductTypes\ConfigInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Customer\Model\Session;
+use Magento\Framework\Json\EncoderInterface as JsonEncoderInterface;
+use Magento\Framework\Locale\FormatInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Stdlib\StringUtils;
+use Magento\Framework\Url\EncoderInterface;
 use Magento\Review\Block\Product\View\ListView as ProductListView;
 use Magento\Review\Model\ResourceModel\Review\Collection;
+use Magento\Review\Model\ResourceModel\Review\CollectionFactory as ReviewCollectionFactory;
 use Magento\Review\Model\Review;
 use TrustMate\Opinions\Api\Data\ProductReviewInterface;
+use TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory;
+use Zend_Db_Expr;
 
 class ListView extends ProductListView
 {
-    private \TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory $trustmateCollectionFactory;
+    /**
+     * @var CollectionFactory
+     */
+    private $trustmateCollectionFactory;
+
     public function __construct(
-        \Magento\Catalog\Block\Product\Context $context, \Magento\Framework\Url\EncoderInterface $urlEncoder, \Magento\Framework\Json\EncoderInterface $jsonEncoder, \Magento\Framework\Stdlib\StringUtils $string, \Magento\Catalog\Helper\Product $productHelper, \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig, \Magento\Framework\Locale\FormatInterface $localeFormat, \Magento\Customer\Model\Session $customerSession, ProductRepositoryInterface $productRepository, \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency, \Magento\Review\Model\ResourceModel\Review\CollectionFactory $collectionFactory,
-        \TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory $trustmateCollectionFactory,
-        array $data = [])
-    {
+        Context                    $context,
+        EncoderInterface           $urlEncoder,
+        JsonEncoderInterface       $jsonEncoder,
+        StringUtils                $string,
+        Product                    $productHelper,
+        ConfigInterface            $productTypeConfig,
+        FormatInterface            $localeFormat,
+        Session                    $customerSession,
+        ProductRepositoryInterface $productRepository,
+        PriceCurrencyInterface     $priceCurrency,
+        ReviewCollectionFactory $collectionFactory,
+        CollectionFactory          $trustmateCollectionFactory,
+        array                      $data = []
+    ) {
         $this->trustmateCollectionFactory = $trustmateCollectionFactory;
-        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig, $localeFormat, $customerSession, $productRepository, $priceCurrency, $collectionFactory, $data);
+        parent::__construct(
+            $context,
+            $urlEncoder,
+            $jsonEncoder,
+            $string,
+            $productHelper,
+            $productTypeConfig,
+            $localeFormat,
+            $customerSession,
+            $productRepository,
+            $priceCurrency,
+            $collectionFactory,
+            $data
+        );
     }
 
     /**
-     * @param Review|ProductReviewInterface $review
+     * @param ProductReviewInterface|Review $review
      *
      * @return bool
      */
-    public function isTrustMateOpinion($review): bool
+    public function isTrustMateOpinion(ProductReviewInterface|Review $review): bool
     {
         return $review->getTitle() === 'Opinia z TrustMate';
     }
@@ -56,6 +95,7 @@ class ListView extends ProductListView
             }
         }
 
+        $magentoReviewsNumber = $this->_reviewsCollection->getSize();
         $reviewsCollection = $this->_reviewsCollection;
         $trustmateCollection = $this->trustmateCollectionFactory->create();
         $reviewsCollection->getSelect()->reset('columns');
@@ -65,7 +105,18 @@ class ListView extends ProductListView
         $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
         $trustmateCollection->getSelect()->reset('columns');
-        $trustmateCollection->getSelect()->columns(['id', 'id', 'store_id', 'author_email', 'body', 'author_name', 'created_at', 'product']);
+        $trustmateCollection->getSelect()->columns(
+            [
+                'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST(' . $magentoReviewsNumber . ' AS INT)'),
+                'id',
+                'store_id',
+                'author_email',
+                'body',
+                'author_name',
+                'created_at',
+                'product'
+            ]
+        );
         $trustmateCollection->addFieldToFilter('store_id', ['eq' => $storeId]);
         $trustmateCollection->addFieldToFilter('product', ['eq' => $product->getId()]);
 
@@ -81,7 +132,6 @@ class ListView extends ProductListView
         ]);
         $reviewsCollection->setOrder('created_at', 'DESC');
         $reviewsCollection->addRateVotes();
-
 
         return $reviewsCollection;
     }

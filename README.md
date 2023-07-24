@@ -22,8 +22,7 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 
 # Upgrading
 
-
-## To version 3.0.0
+## To version 3.0.0 from version 1.2.0+
 
 BEFORE UPDATE:
 
@@ -33,6 +32,8 @@ Due to changed review storage structure, reviews from TrustMate need to be re-do
 DELETE FROM review WHERE trustmate_review_id IN (SELECT id FROM trustmate_product_opinions);
 DELETE FROM trustmate_product_opinions;
 ```
+
+If you're using older version, please remove all TrustMate reviews using review title for example.
 
 AFTER UPDATE:
 
@@ -53,6 +54,10 @@ php bin/magento trustmate:import:opinions
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
 #### Change log
+
+##### 3.0.2 (2023-07-24)
+- Fixed issues with Magento and TrustMate review overlapping
+- Fixed issue with product ratings
 
 ##### 3.0.1 (2023-06-21)
 - Fixed issues with pagination

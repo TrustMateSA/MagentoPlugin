@@ -14,6 +14,9 @@ use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Review\Model\Review\Config as ReviewsConfig;
 use Magento\ReviewGraphQl\Model\DataProvider\AggregatedReviewsDataProvider;
 use Magento\ReviewGraphQl\Model\DataProvider\ProductReviewsDataProvider;
+use TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory;
+use Zend_Db_Expr;
+use Zend_Db_Select_Exception;
 
 class Reviews implements ResolverInterface
 {
@@ -33,7 +36,7 @@ class Reviews implements ResolverInterface
     private $reviewsConfig;
 
     /**
-     * @var \TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory
+     * @var CollectionFactory
      */
     private $trustmateCollectionFactory;
 
@@ -41,14 +44,14 @@ class Reviews implements ResolverInterface
      * @param ProductReviewsDataProvider $productReviewsDataProvider
      * @param AggregatedReviewsDataProvider $aggregatedReviewsDataProvider
      * @param ReviewsConfig $reviewsConfig
+     * @param CollectionFactory $trustmateCollectionFactory
      */
     public function __construct(
-        ProductReviewsDataProvider                                              $productReviewsDataProvider,
-        AggregatedReviewsDataProvider                                           $aggregatedReviewsDataProvider,
-        ReviewsConfig                                                           $reviewsConfig,
-        \TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory $trustmateCollectionFactory
-    )
-    {
+        ProductReviewsDataProvider $productReviewsDataProvider,
+        AggregatedReviewsDataProvider $aggregatedReviewsDataProvider,
+        ReviewsConfig $reviewsConfig,
+        CollectionFactory $trustmateCollectionFactory
+    ) {
         $this->productReviewsDataProvider = $productReviewsDataProvider;
         $this->aggregatedReviewsDataProvider = $aggregatedReviewsDataProvider;
         $this->reviewsConfig = $reviewsConfig;
@@ -66,18 +69,17 @@ class Reviews implements ResolverInterface
      *
      * @return array|Value|mixed
      *
-     * @throws GraphQlInputException
+     * @throws GraphQlInputException|Zend_Db_Select_Exception
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function resolve(
         Field       $field,
-                    $context,
+        $context,
         ResolveInfo $info,
         array       $value = null,
         array       $args = null
-    )
-    {
+    ) {
         if (false === $this->reviewsConfig->isEnabled()) {
             return ['items' => []];
         }
@@ -101,7 +103,6 @@ class Reviews implements ResolverInterface
             $args['currentPage'],
             $args['pageSize']
         );
-
         $trustmateCollection = $this->trustmateCollectionFactory->create();
         $reviewsCollection->getSelect()->reset('columns');
         $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
@@ -110,6 +111,7 @@ class Reviews implements ResolverInterface
         $reviewsCollection->getSelect()->where("review_entity.entity_code='product'");
         $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
+        $magentoReviewsNumber = $reviewsCollection->getSize();
         $trustmateCollection->getSelect()->reset('from');
         $trustmateCollection->getSelect()->from('trustmate_product_opinions');
         $trustmateCollection->getSelect()->reset('columns');
@@ -137,7 +139,7 @@ class Reviews implements ResolverInterface
 
         $reviewsCollection->getSelect()->reset();
         $reviewsCollection->getSelect()->from([
-            'main_table' => new \Zend_Db_Expr('(' . (string)$newest . ')')
+            'main_table' => new Zend_Db_Expr('(' . (string)$newest . ')')
         ]);
         $reviewsCollection->setOrder('created_at', 'DESC');
 

@@ -84,7 +84,7 @@
     <type name="Magento\Review\Model\ResourceModel\Review\Collection">
         <plugin name="trustmate_after_load_product_items_review_collection"
                 type="TrustMate\Opinions\Plugin\Magento\Review\Collection"
-                sortOrder="20" disabled="false"/>
+                sortOrder="1" disabled="false"/>
     </type>
 
     <type name="Magento\Sales\Api\ShipOrderInterface">

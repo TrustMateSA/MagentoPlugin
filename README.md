@@ -55,6 +55,9 @@ php bin/magento trustmate:import:opinions
 
 #### Change log
 
+##### 3.0.3 (2023-07-26)
+- Fixed issue with GraphQL
+
 ##### 3.0.2 (2023-07-24)
 - Fixed issues with Magento and TrustMate review overlapping
 - Fixed issue with product ratings

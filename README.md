@@ -55,6 +55,9 @@ php bin/magento trustmate:import:opinions
 
 #### Change log
 
+##### 3.0.4 (2023-07-27)
+- Fixed query issue on version 2.4.5-p2
+
 ##### 3.0.3 (2023-07-26)
 - Fixed issue with GraphQL
 

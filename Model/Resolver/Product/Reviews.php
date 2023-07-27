@@ -103,12 +103,15 @@ class Reviews implements ResolverInterface
             $args['currentPage'],
             $args['pageSize']
         );
+
         $trustmateCollection = $this->trustmateCollectionFactory->create();
         $reviewsCollection->getSelect()->reset('columns');
         $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
             'detail.nickname', 'main_table.created_at', 'review_entity.entity_code']);
         $reviewsCollection->getSelect()->reset('where');
+        $reviewsCollection->getSelect()->reset('order');
         $reviewsCollection->getSelect()->where("review_entity.entity_code='product'");
+        $reviewsCollection->getSelect()->limit();
         $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
         $magentoReviewsNumber = $reviewsCollection->getSize();
@@ -141,8 +144,8 @@ class Reviews implements ResolverInterface
         $reviewsCollection->getSelect()->from([
             'main_table' => new Zend_Db_Expr('(' . (string)$newest . ')')
         ]);
-        $reviewsCollection->setOrder('created_at', 'DESC');
-
+        $reviewsCollection->getSelect()->limit($args['pageSize']);
+        $reviewsCollection->getSelect()->order('created_at DESC');
         foreach ($reviewsCollection->getData() as $itemData) {
             if (isset($reviewsCollection->getItems()[$itemData['review_id']])) {
                 continue;

@@ -130,7 +130,7 @@ class ListView extends ProductListView
         $reviewsCollection->getSelect()->from([
             'main_table' => new \Zend_Db_Expr('(' . (string)$newest . ')')
         ]);
-        $reviewsCollection->setOrder('created_at', 'DESC');
+        $reviewsCollection->getSelect()->order('created_at DESC');
         $reviewsCollection->addRateVotes();
 
         return $reviewsCollection;

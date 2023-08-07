@@ -11,6 +11,7 @@ use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Review\Model\ResourceModel\Review\CollectionFactory as MagentoReviewCollectionFactory;
 use Magento\Review\Model\Review\Config as ReviewsConfig;
 use Magento\ReviewGraphQl\Model\DataProvider\AggregatedReviewsDataProvider;
 use Magento\ReviewGraphQl\Model\DataProvider\ProductReviewsDataProvider;
@@ -41,21 +42,24 @@ class Reviews implements ResolverInterface
     private $trustmateCollectionFactory;
 
     /**
-     * @param ProductReviewsDataProvider $productReviewsDataProvider
-     * @param AggregatedReviewsDataProvider $aggregatedReviewsDataProvider
-     * @param ReviewsConfig $reviewsConfig
-     * @param CollectionFactory $trustmateCollectionFactory
+     * @param ProductReviewsDataProvider     $productReviewsDataProvider
+     * @param AggregatedReviewsDataProvider  $aggregatedReviewsDataProvider
+     * @param ReviewsConfig                  $reviewsConfig
+     * @param CollectionFactory              $trustmateCollectionFactory
+     * @param MagentoReviewCollectionFactory $magentoReviewCollectionFactory
      */
     public function __construct(
         ProductReviewsDataProvider $productReviewsDataProvider,
         AggregatedReviewsDataProvider $aggregatedReviewsDataProvider,
         ReviewsConfig $reviewsConfig,
-        CollectionFactory $trustmateCollectionFactory
+        CollectionFactory $trustmateCollectionFactory,
+        MagentoReviewCollectionFactory $magentoReviewCollectionFactory
     ) {
         $this->productReviewsDataProvider = $productReviewsDataProvider;
         $this->aggregatedReviewsDataProvider = $aggregatedReviewsDataProvider;
         $this->reviewsConfig = $reviewsConfig;
         $this->trustmateCollectionFactory = $trustmateCollectionFactory;
+        $this->magentoReviewCollectionFactory = $magentoReviewCollectionFactory;
     }
 
     /**
@@ -104,6 +108,7 @@ class Reviews implements ResolverInterface
             $args['pageSize']
         );
 
+        $magentoReviewsLastId = $this->magentoReviewCollectionFactory->create()->getLastItem()->getId();
         $trustmateCollection = $this->trustmateCollectionFactory->create();
         $reviewsCollection->getSelect()->reset('columns');
         $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
@@ -114,13 +119,12 @@ class Reviews implements ResolverInterface
         $reviewsCollection->getSelect()->limit();
         $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
-        $magentoReviewsNumber = $reviewsCollection->getSize();
         $trustmateCollection->getSelect()->reset('from');
         $trustmateCollection->getSelect()->from('trustmate_product_opinions');
         $trustmateCollection->getSelect()->reset('columns');
         $trustmateCollection->getSelect()->columns(
             [
-                'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST(' . $magentoReviewsNumber . ' AS INT)'),
+                'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST(' . $magentoReviewsLastId . ' AS INT)'),
                 'id',
                 'store_id',
                 'author_email',

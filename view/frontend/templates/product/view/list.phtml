@@ -8,7 +8,8 @@ use TrustMate\Opinions\Block\Product\View\ListView;
  * @var ListView $block
  */
 
-$items = $block->getReviewsCollection()->getItems();
+$reviewsCollection = $block->getReviewsCollection();
+$items = $reviewsCollection->getItems();
 $format = $block->getDateFormat() ?: IntlDateFormatter::SHORT;
 
 if ($items !== null):

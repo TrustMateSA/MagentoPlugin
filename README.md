@@ -19,10 +19,15 @@
 In System → Tools → Cache management → Flush Magento Cache or from command line:
   * php bin/magento cache:flush
 
+# Important notice about displaying reviews using this module
+
+Version 3.0.x is a last version that will allow presentqing TrustMate reviews using this module.
+This feature will be removed in version 3.1.x. Using TrustMate widget or creating custom integration
+using our APIs is recommended.
 
 # Upgrading
 
-## To version 3.0.0 from version 1.2.0+
+## To version 3.0.0 from version 1.2.0+ if you render reviews using module
 
 BEFORE UPDATE:
 
@@ -54,6 +59,8 @@ php bin/magento trustmate:import:opinions
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
 #### Change log
+##### 3.0.5 (2023-08-08)
+- Fix the issue with average rating in graphql and the issue with the same ID in magento and trustmate review
 
 ##### 3.0.4 (2023-07-27)
 - Fixed query issue on version 2.4.5-p2

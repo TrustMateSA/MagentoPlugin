@@ -44,10 +44,10 @@ class ListView extends ProductListView
         FormatInterface            $localeFormat,
         Session                    $customerSession,
         ProductRepositoryInterface $productRepository,
-        PriceCurrencyInterface     $priceCurrency,
+        PriceCurrencyInterface $priceCurrency,
         ReviewCollectionFactory $collectionFactory,
-        CollectionFactory          $trustmateCollectionFactory,
-        array                      $data = []
+        CollectionFactory $trustmateCollectionFactory,
+        array $data = []
     ) {
         $this->trustmateCollectionFactory = $trustmateCollectionFactory;
         parent::__construct(
@@ -93,46 +93,47 @@ class ListView extends ProductListView
             } else {
                 $this->_reviewsCollection->addEntityFilter('product', $product->getId());
             }
+
+            $magentoReviewsLastId = (string)$this->_reviewsColFactory->create()->getLastItem()->getId();
+            $reviewsCollection = $this->_reviewsCollection;
+            $trustmateCollection = $this->trustmateCollectionFactory->create();
+            $reviewsCollection->getSelect()->reset('columns');
+            $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
+                'detail.nickname', 'main_table.created_at', 'review_entity.entity_code']);
+            $reviewsCollection->getSelect()->where("review_entity.entity_code='product'");
+            $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
+
+            $trustmateCollection->getSelect()->reset('columns');
+            $trustmateCollection->getSelect()->columns(
+                [
+                    'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST('. $magentoReviewsLastId .' AS INT)'),
+                    'id',
+                    'store_id',
+                    'author_email',
+                    'body',
+                    'author_name',
+                    'created_at',
+                    'product'
+                ]
+            );
+            $trustmateCollection->addFieldToFilter('store_id', ['eq' => $storeId]);
+            $trustmateCollection->addFieldToFilter('product', ['eq' => $product->getId()]);
+
+            $newest = clone $reviewsCollection->getSelect()->union([
+                (string)$reviewsCollection->getSelect(),
+                (string)$trustmateCollection->getSelect()
+            ]);
+            $newest->reset('from');
+
+            $reviewsCollection->getSelect()->reset();
+            $reviewsCollection->getSelect()->from([
+                'main_table' => new \Zend_Db_Expr('(' . (string)$newest . ')')
+            ]);
+            $reviewsCollection->getSelect()->order('created_at DESC');
+            $reviewsCollection->addRateVotes();
+            $this->_reviewsCollection = $reviewsCollection;
         }
 
-        $magentoReviewsNumber = $this->_reviewsCollection->getSize();
-        $reviewsCollection = $this->_reviewsCollection;
-        $trustmateCollection = $this->trustmateCollectionFactory->create();
-        $reviewsCollection->getSelect()->reset('columns');
-        $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
-            'detail.nickname', 'main_table.created_at', 'review_entity.entity_code']);
-        $reviewsCollection->getSelect()->where("review_entity.entity_code='product'");
-        $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
-
-        $trustmateCollection->getSelect()->reset('columns');
-        $trustmateCollection->getSelect()->columns(
-            [
-                'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST(' . $magentoReviewsNumber . ' AS INT)'),
-                'id',
-                'store_id',
-                'author_email',
-                'body',
-                'author_name',
-                'created_at',
-                'product'
-            ]
-        );
-        $trustmateCollection->addFieldToFilter('store_id', ['eq' => $storeId]);
-        $trustmateCollection->addFieldToFilter('product', ['eq' => $product->getId()]);
-
-        $newest = clone $reviewsCollection->getSelect()->union([
-            (string)$reviewsCollection->getSelect(),
-            (string)$trustmateCollection->getSelect()
-        ]);
-        $newest->reset('from');
-
-        $reviewsCollection->getSelect()->reset();
-        $reviewsCollection->getSelect()->from([
-            'main_table' => new \Zend_Db_Expr('(' . (string)$newest . ')')
-        ]);
-        $reviewsCollection->getSelect()->order('created_at DESC');
-        $reviewsCollection->addRateVotes();
-
-        return $reviewsCollection;
+        return $this->_reviewsCollection;
     }
 }

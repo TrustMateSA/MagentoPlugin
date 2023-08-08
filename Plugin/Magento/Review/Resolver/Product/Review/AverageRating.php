@@ -54,13 +54,13 @@ class AverageRating
         ?array $value
     ) :float {
         $review = $value['model'];
-        $reviewModel = $this->trustmateReviewModel->create();
-        $this->trustmateReviewResourceModel->load($reviewModel, $review->getId());
-
-        if (!$reviewModel->getId()) {
+        if ($review->getTitle() !== 'Opinia z TrustMate') {
             return $result;
         }
 
-        return ((int)$reviewModel->getGrade() / 5) * 100;
+        $trustmateReviewModel = $this->trustmateReviewModel->create();
+        $this->trustmateReviewResourceModel->load($trustmateReviewModel, $review->getDetailId());
+
+        return ((int)$trustmateReviewModel->getGrade() / 5) * 100;
     }
 }

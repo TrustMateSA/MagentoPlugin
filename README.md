@@ -60,7 +60,8 @@ php bin/magento trustmate:import:opinions
 
 #### Change log
 ##### 3.0.5 (2023-08-08)
-- Fix the issue with average rating in graphql and the issue with the same ID in magento and trustmate review
+- Fixed issue with average rating in GraphQL
+- Fixed issue with the same ID in magento and TrustMate review
 
 ##### 3.0.4 (2023-07-27)
 - Fixed query issue on version 2.4.5-p2

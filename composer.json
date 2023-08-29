@@ -2,7 +2,7 @@
     "name": "trustmate/magento-extension",
     "description": "Plugin for TrustMate.io reviews integration",
     "type": "magento2-module",
-    "version": "3.0.5",
+    "version": "3.0.6",
     "license": [
         "OSL-3.0"
     ],

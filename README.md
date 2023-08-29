@@ -59,6 +59,11 @@ php bin/magento trustmate:import:opinions
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
 #### Change log
+
+##### 3.0.6 (2023-08-29)
+- Fixed issues on PHP 7
+- User agreement related code cleanup
+
 ##### 3.0.5 (2023-08-08)
 - Fixed issue with average rating in GraphQL
 - Fixed issue with the same ID in magento and TrustMate review

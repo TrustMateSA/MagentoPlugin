@@ -50,6 +50,11 @@ class TrustMateRatePatch implements DataPatchInterface
     private $storeManager;
 
     /**
+     * @var RatingResourceModel
+     */
+    private $ratingResource;
+
+    /**
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param RatingFactory            $ratingFactory
      * @param RatingResourceModel      $ratingResource

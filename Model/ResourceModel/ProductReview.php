@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace TrustMate\Opinions\Model\ResourceModel;
 
+use Magento\Framework\DB\Select;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class ProductReview extends AbstractDb
@@ -23,9 +24,9 @@ class ProductReview extends AbstractDb
     }
 
     /**
-     * @return \Magento\Framework\DB\Select
+     * @return Select
      */
-    public function getTranslation(): \Magento\Framework\DB\Select
+    public function getTranslation(): Select
     {
         return $this->_getLoadSelect()
             ->join(

@@ -107,8 +107,7 @@ class Review
         Logger                           $logger,
         ProductReviewRepositoryInterface $trustmateReviewRepositoryInterface,
         Rating                           $trustmateRating
-    )
-    {
+    ) {
         $this->productReviewRepositoryInterface = $productReviewRepositoryInterface;
         $this->filterBuilder = $filterBuilder;
         $this->filterGroupBuilder = $filterGroupBuilder;

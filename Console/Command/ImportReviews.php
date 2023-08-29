@@ -118,8 +118,7 @@ class ImportReviews extends Command
         $this->state->setAreaCode(Area::AREA_ADMINHTML);
         $output->writeln('<info>Start importing</info>');
 
-        foreach ($this->getAllStores() as $store)
-        {
+        foreach ($this->getAllStores() as $store) {
             $storeId = (int)$store->getId();
 //            $languageCode = null;
 //            $translation = false;

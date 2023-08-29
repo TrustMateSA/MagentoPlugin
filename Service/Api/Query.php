@@ -24,11 +24,12 @@ class Query
     }
 
     /**
-     * @param int|null    $storeId
+     * @param int         $storeId
+     * @param string|null $languageCode
+     *
+     * @param bool        $translation
      * @param string      $perPage
      * @param string      $page
-     * @param bool        $translation
-     * @param string|null $languageCode
      *
      * @return array[]
      * @throws InputException

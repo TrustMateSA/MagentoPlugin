@@ -33,7 +33,6 @@ class Collection
      */
     private $reviewModel;
 
-
     /**
      * @param TrustmateCollectionFactory $trustmateCollectionFactory
      * @param StoreManagerInterface $storeManager

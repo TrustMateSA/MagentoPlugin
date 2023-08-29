@@ -71,7 +71,7 @@ class ListView extends ProductListView
      *
      * @return bool
      */
-    public function isTrustMateOpinion(ProductReviewInterface|Review $review): bool
+    public function isTrustMateOpinion($review): bool
     {
         return $review->getTitle() === 'Opinia z TrustMate';
     }
@@ -106,7 +106,9 @@ class ListView extends ProductListView
             $trustmateCollection->getSelect()->reset('columns');
             $trustmateCollection->getSelect()->columns(
                 [
-                    'review_id' => new Zend_Db_Expr('CAST(id AS INT) + CAST('. $magentoReviewsLastId .' AS INT)'),
+                    'review_id' => new Zend_Db_Expr(
+                        'CAST(id AS INT) + CAST(' . $magentoReviewsLastId . ' AS INT)'
+                    ),
                     'id',
                     'store_id',
                     'author_email',

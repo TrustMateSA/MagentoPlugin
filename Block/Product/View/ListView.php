@@ -16,7 +16,6 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Json\EncoderInterface as JsonEncoderInterface;
 use Magento\Framework\Locale\FormatInterface;
-use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\StringUtils;
 use Magento\Framework\Url\EncoderInterface;
@@ -35,11 +34,6 @@ class ListView extends ProductListView
      */
     private $trustmateCollectionFactory;
 
-    /**
-     * @var Resolver
-     */
-    private Resolver $localeResolver;
-
     public function __construct(
         Context                    $context,
         EncoderInterface           $urlEncoder,
@@ -53,11 +47,9 @@ class ListView extends ProductListView
         PriceCurrencyInterface $priceCurrency,
         ReviewCollectionFactory $collectionFactory,
         CollectionFactory $trustmateCollectionFactory,
-        Resolver $localeResolver,
         array $data = []
     ) {
         $this->trustmateCollectionFactory = $trustmateCollectionFactory;
-        $this->localeResolver = $localeResolver;
         parent::__construct(
             $context,
             $urlEncoder,
@@ -145,15 +137,5 @@ class ListView extends ProductListView
         }
 
         return $this->_reviewsCollection;
-    }
-
-    /**
-     * @return false|string
-     */
-    public function getStoreLocale()
-    {
-        $currentLocaleCode = $this->localeResolver->getLocale();
-
-        return strstr($currentLocaleCode, '_', true);
     }
 }

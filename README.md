@@ -60,6 +60,9 @@ php bin/magento trustmate:import:opinions
 
 #### Change log
 
+##### 3.0.7 (2023-11-10)
+- Added verified reviews badges
+
 ##### 3.0.6 (2023-08-29)
 - Fixed issues on PHP 7
 - User agreement related code cleanup

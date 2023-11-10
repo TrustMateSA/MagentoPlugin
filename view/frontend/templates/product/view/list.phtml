@@ -11,6 +11,7 @@ use TrustMate\Opinions\Block\Product\View\ListView;
 $reviewsCollection = $block->getReviewsCollection();
 $items = $reviewsCollection->getItems();
 $format = $block->getDateFormat() ?: IntlDateFormatter::SHORT;
+$imageName = 'verified-review-' . $block->getStoreLocale() .'.png';
 
 if ($items !== null):
     if (count($items)): ?>
@@ -29,11 +30,7 @@ if ($items !== null):
                         if ($review->getStatus() === '1' || $review->getStatus() === null) : ?>
                             <li class="item review-item <?php if ($block->isTrustMateOpinion($review)): ?> trustmate-opinion <?php endif; ?>"
                                 itemscope itemprop="review" itemtype="http://schema.org/Review">
-                                <?php if ($block->isTrustMateOpinion($review)):
-                                    $imageName = (strtolower($review->getLanguage()) === 'pl')
-                                        ? 'trustmate_confirmed_pl.png'
-                                        : 'trustmate_confirmed_en.png';
-                                    ?>
+                                <?php if ($block->isTrustMateOpinion($review)):?>
                                     <img class="trustmate-badge"
                                          src="<?= $block->getViewFileUrl('TrustMate_Opinions/images/' . $imageName); ?>"
                                          alt="<?= $escaper->escapeHtml($review->getTitle()) ?>">

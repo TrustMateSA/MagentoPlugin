@@ -51,7 +51,7 @@ class ReviewInvitation
         $response = $this->create($data, $storeId);
         if ($response->getStatusCode() !== 200) {
             return [
-                'status' => false,
+                'status' => $response->getStatusCode(),
                 'message' => $response->getReasonPhrase()
             ];
         }

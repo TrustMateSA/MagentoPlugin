@@ -107,7 +107,7 @@ class Save extends MagentoShippingSave
         if ($this->configData->isModuleEnabled()
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::CREATE_SHIPMENT_EVENT
         ) {
-            $order          = $shipment->getOrder();
+            $order = $shipment->getOrder();
             $storeId = (int)$this->storeManager->getStore()->getId();
             $invitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
@@ -118,19 +118,19 @@ class Save extends MagentoShippingSave
             ];
 
             $data['body'] = $this->serializerInterface->serialize($invitationData);
-            $response     = $this->reviewInvitation->sendRequest($data, $storeId);
+            $response = $this->reviewInvitation->sendRequest($data, $storeId);
             if (isset($response['status'])) {
                 $this->logger->error($response['message']);
             }
 
             if ($this->configData->isProductOpinionEnabled()) {
-                foreach ($order->getItems() as $item) {
-                    $product                      = $item->getProduct();
-                    $localId                      = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
-                    $store                        = $this->storeManager->getStore();
+                foreach ($order->getAllVisibleItems() as $item) {
+                    $product = $item->getProduct();
+                    $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
+                    $store = $this->storeManager->getStore();
                     $gtinCode = $this->configData->getGtinCode();
                     $mpnCode  = $this->configData->getMpnCode();
-                    $invitationData['products'][] = [
+                    $invitationData['products'][$product->getSku()] = [
                         'id' => $localId,
                         'name' => $product->getName(),
                         'sku' => $product->getSku(),
@@ -150,7 +150,7 @@ class Save extends MagentoShippingSave
                 }
 
                 $data['body'] = $this->serializerInterface->serialize($invitationData);
-                $response     = $this->reviewInvitation->sendRequest($data, $storeId);
+                $response = $this->reviewInvitation->sendRequest($data, $storeId);
                 if (isset($response['status'])) {
                     $this->logger->error($response['message']);
                 }

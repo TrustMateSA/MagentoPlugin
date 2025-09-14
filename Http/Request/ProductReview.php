@@ -28,21 +28,21 @@ class ProductReview
     /**
      * ProductReview constructor
      *
-     * @param TrustMateRestApi    $apiService
+     * @param TrustMateRestApi $apiService
      * @param SerializerInterface $serializerInterface
      */
     public function __construct(
-        TrustMateRestApi    $apiService,
+        TrustMateRestApi $apiService,
         SerializerInterface $serializerInterface
     ) {
-        $this->apiService          = $apiService;
+        $this->apiService = $apiService;
         $this->serializerInterface = $serializerInterface;
     }
 
     /**
      * @param array $data
-     * @param int   $storeId
-     * @param bool  $translation
+     * @param int $storeId
+     * @param bool $translation
      *
      * @return array|bool|float|int|string|null
      */
@@ -52,7 +52,7 @@ class ProductReview
 
         if ($response->getStatusCode() !== 200) {
             return [
-                'status' => false,
+                'status' => $response->getStatusCode(),
                 'message' => $response->getReasonPhrase()
             ];
         }
@@ -64,8 +64,8 @@ class ProductReview
      * Get review with original language
      *
      * @param array $data
-     * @param int   $storeId
-     * @param bool  $translation
+     * @param int $storeId
+     * @param bool $translation
      *
      * @return Response
      */

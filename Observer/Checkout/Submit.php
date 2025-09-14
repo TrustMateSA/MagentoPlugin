@@ -97,7 +97,7 @@ class Submit implements ObserverInterface
         if ($this->configData->isModuleEnabled()
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::PLACE_ORDER_EVENT
         ) {
-            $order          = $observer->getEvent()->getOrder();
+            $order = $observer->getEvent()->getOrder();
             $storeId = (int)$this->storeManager->getStore()->getId();
             $invitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
@@ -108,20 +108,20 @@ class Submit implements ObserverInterface
             ];
 
             $data['body'] = $this->serializerInterface->serialize($invitationData);
-            $response     = $this->reviewInvitation->sendRequest($data, $storeId);
+            $response = $this->reviewInvitation->sendRequest($data, $storeId);
             if (isset($response['status'])) {
                 $this->logger->error($response['message']);
             }
 
             if ($this->configData->isProductOpinionEnabled()) {
-                foreach ($order->getItems() as $item) {
+                foreach ($order->getAllVisibleItems() as $item) {
                     $product  = $item->getProduct();
                     $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
                     $store    = $this->storeManager->getStore();
                     $gtinCode = $this->configData->getGtinCode();
                     $mpnCode  = $this->configData->getMpnCode();
 
-                    $invitationData['products'][] = [
+                    $invitationData['products'][$product->getSku()] = [
                         'id' => $localId,
                         'name' => $product->getName(),
                         'sku' => $product->getSku(),
@@ -141,7 +141,7 @@ class Submit implements ObserverInterface
                 }
 
                 $data['body'] = $this->serializerInterface->serialize($invitationData);
-                $response     = $this->reviewInvitation->sendRequest($data, $storeId);
+                $response = $this->reviewInvitation->sendRequest($data, $storeId);
                 if (isset($response['status'])) {
                     $this->logger->error($response['message']);
                 }

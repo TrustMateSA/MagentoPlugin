@@ -102,12 +102,17 @@ class ListView extends ProductListView
                 $this->_reviewsCollection->addEntityFilter('product', $product->getId());
             }
 
-            $magentoReviewsLastId = (string)$this->_reviewsColFactory->create()->getLastItem()->getId();
+            $magentoReviewsLastId = (string)$this->_reviewsColFactory->create()->getLastItem()->getId() ?: 0;
             $reviewsCollection = $this->_reviewsCollection;
             $trustmateCollection = $this->trustmateCollectionFactory->create();
             $reviewsCollection->getSelect()->reset('columns');
             $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
-                'detail.nickname', 'main_table.created_at', 'review_entity.entity_code']);
+                'detail.nickname', 'main_table.created_at']);
+            $reviewsCollection->getSelect()->join(
+                ['review_entity' => $reviewsCollection->getTable('review_entity')],
+                'main_table.entity_id = review_entity.entity_id',
+                ['entity_code']
+            );
             $reviewsCollection->getSelect()->where("review_entity.entity_code='product'");
             $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
@@ -115,7 +120,7 @@ class ListView extends ProductListView
             $trustmateCollection->getSelect()->columns(
                 [
                     'review_id' => new Zend_Db_Expr(
-                        'CAST(id AS INT) + CAST(' . $magentoReviewsLastId . ' AS INT)'
+                        'CAST(id AS UNSIGNED) + CAST(' . $magentoReviewsLastId . ' AS UNSIGNED)'
                     ),
                     'id',
                     'store_id',

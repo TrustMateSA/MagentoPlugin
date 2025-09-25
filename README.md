@@ -58,7 +58,11 @@ php bin/magento trustmate:import:opinions
 
 * If you were using agreements from module please turn it off after upgrade. Use own agreement if necessary.
 
-#### Change log
+#### Changelog
+
+##### 3.0.8 (2025-09-25)
+- Fix duplicate products in invitation from multi-level configurable product order
+- Fix SQLSTATE[42000]: Syntax error or access violation: 106
 
 ##### 3.0.7 (2023-11-10)
 - Added verified reviews badges

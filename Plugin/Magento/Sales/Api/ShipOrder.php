@@ -10,7 +10,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use TrustMate\Opinions\Enum\TrustMateConfigDataEnum;
 use TrustMate\Opinions\Http\Request\ReviewInvitation;
@@ -35,11 +34,6 @@ class ShipOrder
     private $serializerInterface;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * @var Category
      */
     private $category;
@@ -60,39 +54,36 @@ class ShipOrder
     private $logger;
 
     /**
-     * @param Data                     $configData
-     * @param SerializerInterface      $serializerInterface
-     * @param StoreManagerInterface    $storeManager
+     * @param Data $configData
+     * @param SerializerInterface $serializerInterface
      * @param OrderRepositoryInterface $orderRepository
-     * @param Resolver                 $resolver
-     * @param LoggerInterface          $logger
-     * @param Category                 $category
-     * @param ReviewInvitation         $reviewInvitation
+     * @param Resolver $resolver
+     * @param LoggerInterface $logger
+     * @param Category $category
+     * @param ReviewInvitation $reviewInvitation
      */
     public function __construct(
-        Data                     $configData,
-        SerializerInterface      $serializerInterface,
-        StoreManagerInterface    $storeManager,
+        Data $configData,
+        SerializerInterface $serializerInterface,
         OrderRepositoryInterface $orderRepository,
-        Resolver                 $resolver,
-        LoggerInterface          $logger,
-        Category                 $category,
-        ReviewInvitation         $reviewInvitation
+        Resolver $resolver,
+        LoggerInterface $logger,
+        Category $category,
+        ReviewInvitation $reviewInvitation
     ) {
-        $this->configData          = $configData;
+        $this->configData = $configData;
         $this->serializerInterface = $serializerInterface;
-        $this->storeManager        = $storeManager;
-        $this->orderRepository     = $orderRepository;
-        $this->resolver            = $resolver;
-        $this->logger              = $logger;
-        $this->category            = $category;
-        $this->reviewInvitation    = $reviewInvitation;
+        $this->orderRepository = $orderRepository;
+        $this->resolver = $resolver;
+        $this->logger = $logger;
+        $this->category = $category;
+        $this->reviewInvitation = $reviewInvitation;
     }
 
     /**
      * @param ShipOrderInterface $subject
-     * @param int|null           $result
-     * @param int                $orderId
+     * @param int|null $result
+     * @param int $orderId
      *
      * @return int|null
      * @throws NoSuchEntityException
@@ -102,7 +93,7 @@ class ShipOrder
         if ($this->configData->isModuleEnabled()
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::CREATE_SHIPMENT_EVENT
         ) {
-            $order                = $this->orderRepository->get($orderId);
+            $order = $this->orderRepository->get($orderId);
             $reviewInvitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
@@ -112,19 +103,19 @@ class ShipOrder
             ];
 
             $data['body'] = $this->serializerInterface->serialize($reviewInvitationData);
-            $storeId = (int)$this->storeManager->getStore()->getId();
-            $response     = $this->reviewInvitation->sendRequest($data, $storeId);
+            $storeId = (int) $order->getStoreId();
+            $response = $this->reviewInvitation->sendRequest($data, $storeId);
             if (isset($response['status'])) {
                 $this->logger->error($response['message']);
             }
 
             if ($this->configData->isProductOpinionEnabled()) {
                 foreach ($order->getItems() as $item) {
-                    $product                            = $item->getProduct();
-                    $localId                            = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
-                    $store                              = $this->storeManager->getStore();
-                    $gtinCode                           = $this->configData->getGtinCode();
-                    $mpnCode                            = $this->configData->getMpnCode();
+                    $product = $item->getProduct();
+                    $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
+                    $store = $order->getStore();
+                    $gtinCode = $this->configData->getGtinCode();
+                    $mpnCode = $this->configData->getMpnCode();
                     $reviewInvitationData['products'][] = [
                         'id' => $localId,
                         'name' => $product->getName(),
@@ -143,9 +134,8 @@ class ShipOrder
                 if ($this->configData->isSandboxEnabled()) {
                     $this->logger->info(print_r($reviewInvitationData, true));
                 }
-
                 $data['body'] = $this->serializerInterface->serialize($reviewInvitationData);
-                $response     = $this->reviewInvitation->sendRequest($data, $storeId);
+                $response = $this->reviewInvitation->sendRequest($data, $storeId);
                 if (isset($response['status'])) {
                     $this->logger->error($response['message']);
                 }

@@ -20,7 +20,6 @@ use Magento\Sales\Model\Order\Shipment\ShipmentValidatorInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as MagentoShippingSave;
 use Magento\Shipping\Controller\Adminhtml\Order\ShipmentLoader;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
-use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use TrustMate\Opinions\Enum\TrustMateConfigDataEnum;
 use TrustMate\Opinions\Http\Request\ReviewInvitation;
@@ -55,37 +54,30 @@ class Save extends MagentoShippingSave
     protected $serializerInterface;
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
 
     public function __construct(
-        Context                    $context,
-        ShipmentLoader             $shipmentLoader,
-        LabelGenerator             $labelGenerator,
-        ShipmentSender             $shipmentSender,
-        ReviewInvitation           $reviewInvitation,
-        Data                       $configData,
-        Category                   $category,
-        Resolver                   $resolver,
-        SerializerInterface        $serializerInterface,
-        StoreManagerInterface      $storeManager,
-        LoggerInterface            $logger,
+        Context $context,
+        ShipmentLoader $shipmentLoader,
+        LabelGenerator $labelGenerator,
+        ShipmentSender $shipmentSender,
+        ReviewInvitation $reviewInvitation,
+        Data $configData,
+        Category $category,
+        Resolver $resolver,
+        SerializerInterface $serializerInterface,
+        LoggerInterface $logger,
         ShipmentValidatorInterface $shipmentValidator = null,
-        SalesData                  $salesData = null
+        SalesData $salesData = null
     ) {
-        $this->reviewInvitation    = $reviewInvitation;
-        $this->configData          = $configData;
-        $this->category            = $category;
-        $this->resolver            = $resolver;
+        $this->reviewInvitation = $reviewInvitation;
+        $this->configData = $configData;
+        $this->category = $category;
+        $this->resolver = $resolver;
         $this->serializerInterface = $serializerInterface;
-        $this->storeManager        = $storeManager;
-        $this->logger              = $logger;
+        $this->logger = $logger;
 
         parent::__construct(
             $context,
@@ -108,7 +100,7 @@ class Save extends MagentoShippingSave
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::CREATE_SHIPMENT_EVENT
         ) {
             $order = $shipment->getOrder();
-            $storeId = (int)$this->storeManager->getStore()->getId();
+            $storeId = (int) $order->getStoreId();
             $invitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
@@ -127,7 +119,7 @@ class Save extends MagentoShippingSave
                 foreach ($order->getAllVisibleItems() as $item) {
                     $product = $item->getProduct();
                     $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
-                    $store = $this->storeManager->getStore();
+                    $store = $order->getStore();
                     $gtinCode = $this->configData->getGtinCode();
                     $mpnCode  = $this->configData->getMpnCode();
                     $invitationData['products'][$product->getSku()] = [

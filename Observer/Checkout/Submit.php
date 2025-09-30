@@ -15,7 +15,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use TrustMate\Opinions\Enum\TrustMateConfigDataEnum;
 use TrustMate\Opinions\Http\Request\ReviewInvitation;
@@ -50,40 +49,32 @@ class Submit implements ObserverInterface
     protected $serializerInterface;
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * @param Data                  $configData
-     * @param ReviewInvitation      $reviewInvitation
-     * @param Category              $category
-     * @param Resolver              $resolver
-     * @param SerializerInterface   $serializerInterface
-     * @param StoreManagerInterface $storeManager
-     * @param LoggerInterface       $logger
+     * @param Data $configData
+     * @param ReviewInvitation $reviewInvitation
+     * @param Category $category
+     * @param Resolver $resolver
+     * @param SerializerInterface $serializerInterface
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        Data                  $configData,
-        ReviewInvitation      $reviewInvitation,
-        Category              $category,
-        Resolver              $resolver,
-        SerializerInterface   $serializerInterface,
-        StoreManagerInterface $storeManager,
-        LoggerInterface       $logger
+        Data $configData,
+        ReviewInvitation $reviewInvitation,
+        Category $category,
+        Resolver $resolver,
+        SerializerInterface $serializerInterface,
+        LoggerInterface $logger
     ) {
-        $this->configData          = $configData;
-        $this->reviewInvitation    = $reviewInvitation;
-        $this->category            = $category;
-        $this->resolver            = $resolver;
+        $this->configData = $configData;
+        $this->reviewInvitation = $reviewInvitation;
+        $this->category = $category;
+        $this->resolver = $resolver;
         $this->serializerInterface = $serializerInterface;
-        $this->storeManager        = $storeManager;
-        $this->logger              = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -98,7 +89,7 @@ class Submit implements ObserverInterface
             && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::PLACE_ORDER_EVENT
         ) {
             $order = $observer->getEvent()->getOrder();
-            $storeId = (int)$this->storeManager->getStore()->getId();
+            $storeId = (int) $order->getStoreId();
             $invitationData = [
                 'customer_name' => $order->getCustomerFirstname(),
                 'send_to' => $order->getCustomerEmail(),
@@ -115,11 +106,11 @@ class Submit implements ObserverInterface
 
             if ($this->configData->isProductOpinionEnabled()) {
                 foreach ($order->getAllVisibleItems() as $item) {
-                    $product  = $item->getProduct();
+                    $product = $item->getProduct();
                     $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
-                    $store    = $this->storeManager->getStore();
+                    $store = $order->getStore();
                     $gtinCode = $this->configData->getGtinCode();
-                    $mpnCode  = $this->configData->getMpnCode();
+                    $mpnCode = $this->configData->getMpnCode();
 
                     $invitationData['products'][$product->getSku()] = [
                         'id' => $localId,

@@ -60,6 +60,9 @@ php bin/magento trustmate:import:opinions
 
 #### Changelog
 
+##### 3.0.9 (2025-10-01)
+- Attempt to fix rare case when invitations were created for wrong store
+
 ##### 3.0.8 (2025-09-25)
 - Fix duplicate products in invitation from multi-level configurable product order
 - Fix SQLSTATE[42000]: Syntax error or access violation: 106

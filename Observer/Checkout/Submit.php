@@ -12,14 +12,12 @@ namespace TrustMate\Opinions\Observer\Checkout;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Framework\UrlInterface;
 use Psr\Log\LoggerInterface;
 use TrustMate\Opinions\Enum\TrustMateConfigDataEnum;
 use TrustMate\Opinions\Http\Request\ReviewInvitation;
-use TrustMate\Opinions\Model\Category;
 use TrustMate\Opinions\Model\Config\Data;
+use TrustMate\Opinions\Service\Review;
 
 class Submit implements ObserverInterface
 {
@@ -34,14 +32,9 @@ class Submit implements ObserverInterface
     protected $reviewInvitation;
 
     /**
-     * @var Category
+     * @var Review
      */
-    protected $category;
-
-    /**
-     * @var Resolver
-     */
-    protected $resolver;
+    protected $reviewService;
 
     /**
      * @var SerializerInterface
@@ -56,23 +49,20 @@ class Submit implements ObserverInterface
     /**
      * @param Data $configData
      * @param ReviewInvitation $reviewInvitation
-     * @param Category $category
-     * @param Resolver $resolver
      * @param SerializerInterface $serializerInterface
+     * @param Review $reviewService
      * @param LoggerInterface $logger
      */
     public function __construct(
         Data $configData,
         ReviewInvitation $reviewInvitation,
-        Category $category,
-        Resolver $resolver,
         SerializerInterface $serializerInterface,
+        Review $reviewService,
         LoggerInterface $logger
     ) {
         $this->configData = $configData;
         $this->reviewInvitation = $reviewInvitation;
-        $this->category = $category;
-        $this->resolver = $resolver;
+        $this->reviewService = $reviewService;
         $this->serializerInterface = $serializerInterface;
         $this->logger = $logger;
     }
@@ -85,57 +75,19 @@ class Submit implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if ($this->configData->isModuleEnabled()
-            && $this->configData->getInvitationEvent() === TrustMateConfigDataEnum::PLACE_ORDER_EVENT
-        ) {
-            $order = $observer->getEvent()->getOrder();
-            $storeId = (int) $order->getStoreId();
-            $invitationData = [
-                'customer_name' => $order->getCustomerFirstname(),
-                'send_to' => $order->getCustomerEmail(),
-                'order_number' => $order->getIncrementId(),
-                'language' => strstr($this->resolver->getLocale(), '_', true),
-                'source_type' => 'magento3.0'
-            ];
+        $order = $observer->getEvent()->getOrder();
+        $storeId = (int) $order->getStoreId();
 
+        if ($this->configData->isModuleEnabled($storeId)
+            && $this->configData->getInvitationEvent($storeId) === TrustMateConfigDataEnum::PLACE_ORDER_EVENT
+        ) {
+            $isProductInvitationEnabled = $this->configData->isProductOpinionEnabled($storeId);
+            $invitationData = $this->reviewService->prepareInvitationData($order, $isProductInvitationEnabled);
             $data['body'] = $this->serializerInterface->serialize($invitationData);
             $response = $this->reviewInvitation->sendRequest($data, $storeId);
+
             if (isset($response['status'])) {
                 $this->logger->error($response['message']);
-            }
-
-            if ($this->configData->isProductOpinionEnabled()) {
-                foreach ($order->getAllVisibleItems() as $item) {
-                    $product = $item->getProduct();
-                    $localId = $this->configData->isFixLocalIdEnabled() ? $product->getId() : $product->getSku();
-                    $store = $order->getStore();
-                    $gtinCode = $this->configData->getGtinCode();
-                    $mpnCode = $this->configData->getMpnCode();
-
-                    $invitationData['products'][$product->getSku()] = [
-                        'id' => $localId,
-                        'name' => $product->getName(),
-                        'sku' => $product->getSku(),
-                        'product_url' => $product->getProductUrl(),
-                        'category' => $this->category->getCategoriesPath($product->getCategoryIds()),
-                        'image_url' => $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA)
-                            . 'catalog/product' . $product->getImage(),
-                        'image_thumb_url' => $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA)
-                            . 'catalog/product' . $product->getThumbnail(),
-                        'gtin' => $gtinCode ? $product->getData($gtinCode) : null,
-                        'mpn' => $mpnCode ? $product->getData($mpnCode) : null
-                    ];
-                }
-
-                if ($this->configData->isSandboxEnabled()) {
-                    $this->logger->info(print_r($invitationData, true));
-                }
-
-                $data['body'] = $this->serializerInterface->serialize($invitationData);
-                $response = $this->reviewInvitation->sendRequest($data, $storeId);
-                if (isset($response['status'])) {
-                    $this->logger->error($response['message']);
-                }
             }
         }
     }

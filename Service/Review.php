@@ -81,6 +81,7 @@ class Review
     ) {
         $this->reviewModel = $reviewModel;
         $this->productRepository = $productRepository;
+        $this->category = $category;
         $this->config = $config;
         $this->store = $store;
         $this->resolver = $resolver;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package   TrustMate\Opinions
  * @copyright 2022 TrustMate
@@ -89,7 +90,7 @@ class Data
         );
     }
 
-    public function getGtinCode(?int $storeId = null): string
+    public function getGtinCode(?int $storeId = null): ?string
     {
         return $this->scopeConfigInterface->getValue(
             self::GTIN_CODE,
@@ -98,7 +99,7 @@ class Data
         );
     }
 
-    public function getMpnCode(?int $storeId = null): string
+    public function getMpnCode(?int $storeId = null): ?string
     {
         return $this->scopeConfigInterface->getValue(
             self::MPN_CODE,

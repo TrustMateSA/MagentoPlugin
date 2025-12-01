@@ -11,6 +11,7 @@ namespace TrustMate\Opinions\Service;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
@@ -19,6 +20,8 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item as OrderItem;
+use Magento\Store\Api\Data\StoreConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store as MagentoStore;
 use TrustMate\Opinions\Logger\Logger;
 use TrustMate\Opinions\Model\Category;
@@ -49,19 +52,14 @@ class Review
     private $configurableType;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * @var Category
      */
     private $category;
-
-    /**
-     * @var Store
-     */
-    private $store;
-
-    /**
-     * @var Resolver
-     */
-    private $resolver;
 
     /**
      * @var Logger
@@ -73,29 +71,20 @@ class Review
         ProductRepositoryInterface $productRepository,
         Configurable $configurableType,
         Category $category,
+        ScopeConfigInterface $scopeConfig,
         Data $config,
-        Store $store,
-        Resolver $resolver,
         Logger $logger
     ) {
         $this->reviewModel = $reviewModel;
         $this->productRepository = $productRepository;
         $this->configurableType = $configurableType;
         $this->category = $category;
+        $this->scopeConfig = $scopeConfig;
         $this->config = $config;
-        $this->store = $store;
-        $this->resolver = $resolver;
         $this->logger = $logger;
     }
 
     /**
-     * Save review
-     *
-     * @param array $item
-     * @param int $storeId
-     * @param bool $translation
-     *
-     * @return array
      * @throws LocalizedException
      */
     public function prepareDataToSave(array $item, int $storeId, bool $translation = false): array
@@ -137,11 +126,16 @@ class Review
     public function prepareInvitationData(Order|OrderInterface $order, bool $includeProducts): array
     {
         $storeId = (int) $order->getStoreId();
+        $localeCode = $this->scopeConfig->getValue(
+            'general/locale/code',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
         $invitationData = [
             'customer_name' => $order->getCustomerFirstname(),
             'send_to' => $order->getCustomerEmail(),
             'order_number' => $order->getIncrementId(),
-            'language' => strstr($this->resolver->getLocale(), '_', true),
+            'language' => strstr($localeCode, '_', true),
             'source_type' => 'magento3.0'
         ];
 

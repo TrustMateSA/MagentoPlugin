@@ -27,6 +27,7 @@ use Magento\Review\Model\Review;
 use TrustMate\Opinions\Api\Data\ProductReviewInterface;
 use TrustMate\Opinions\Model\ResourceModel\ProductReview\CollectionFactory;
 use Zend_Db_Expr;
+use Zend_Db_Select;
 
 class ListView extends ProductListView
 {
@@ -105,14 +106,28 @@ class ListView extends ProductListView
             $magentoReviewsLastId = (string)$this->_reviewsColFactory->create()->getLastItem()->getId() ?: 0;
             $reviewsCollection = $this->_reviewsCollection;
             $trustmateCollection = $this->trustmateCollectionFactory->create();
+
             $reviewsCollection->getSelect()->reset('columns');
-            $reviewsCollection->getSelect()->columns(['main_table.review_id', 'detail.detail_id', 'detail.store_id', 'detail.title', 'detail.detail',
-                'detail.nickname', 'main_table.created_at']);
-            $reviewsCollection->getSelect()->join(
-                ['review_entity' => $reviewsCollection->getTable('review_entity')],
-                'main_table.entity_id = review_entity.entity_id',
-                ['entity_code']
+            $reviewsCollection->getSelect()->columns(
+                [
+                    'main_table.review_id',
+                    'detail.detail_id',
+                    'detail.store_id',
+                    'detail.title',
+                    'detail.detail',
+                    'detail.nickname',
+                    'main_table.created_at',
+                    new Zend_Db_Expr('NULL as product')
+                ]
             );
+            if (!isset($reviewsCollection->getSelect()->getPart(Zend_Db_Select::FROM)['review_entity'])) {
+                $reviewsCollection->getSelect()->join(
+                    ['review_entity' => $reviewsCollection->getTable('review_entity')],
+                    'main_table.entity_id = review_entity.entity_id',
+                    ['entity_code']
+                );
+            }
+
             $reviewsCollection->getSelect()->where("review_entity.entity_code='product'");
             $reviewsCollection->getSelect()->where("main_table.entity_pk_value=" . $product->getId());
 
@@ -131,8 +146,14 @@ class ListView extends ProductListView
                     'product'
                 ]
             );
+
             $trustmateCollection->addFieldToFilter('store_id', ['eq' => $storeId]);
             $trustmateCollection->addFieldToFilter('product', ['eq' => $product->getId()]);
+
+            $reviewsColumns = array_column($reviewsCollection->getSelect()->getPart('columns'), 1);
+            if (in_array('entity_code', $reviewsColumns, true)) {
+                $trustmateCollection->getSelect()->columns(['entity_code' => new Zend_Db_Expr('NULL')]);
+            }
 
             $newest = clone $reviewsCollection->getSelect()->union([
                 (string)$reviewsCollection->getSelect(),
@@ -142,8 +163,9 @@ class ListView extends ProductListView
 
             $reviewsCollection->getSelect()->reset();
             $reviewsCollection->getSelect()->from([
-                'main_table' => new \Zend_Db_Expr('(' . (string)$newest . ')')
+                'main_table' => new Zend_Db_Expr('(' . (string) $newest . ')')
             ]);
+
             $reviewsCollection->getSelect()->order('created_at DESC');
             $reviewsCollection->addRateVotes();
             $this->_reviewsCollection = $reviewsCollection;

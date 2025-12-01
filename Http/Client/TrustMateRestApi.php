@@ -33,33 +33,16 @@ class TrustMateRestApi
      */
     private $configData;
 
-    /**
-     * TrustMate API service constructor
-     *
-     * @param ClientFactory $clientFactory
-     * @param ResponseFactory $responseFactory
-     * @param Data $configData
-     */
     public function __construct(
-        ClientFactory   $clientFactory,
+        ClientFactory $clientFactory,
         ResponseFactory $responseFactory,
-        Data            $configData
+        Data $configData
     ) {
         $this->clientFactory = $clientFactory;
         $this->responseFactory = $responseFactory;
         $this->configData = $configData;
     }
 
-    /**
-     * API request with provided params
-     *
-     * @param int    $storeId
-     * @param string $endpoint
-     * @param array  $data
-     * @param string $method
-     *
-     * @return Response
-     */
     public function doRequest(
         int $storeId,
         string $endpoint,

@@ -10,13 +10,15 @@ namespace TrustMate\Opinions\Service;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\UrlInterface;
+use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Item as OrderItem;
 use Magento\Store\Model\Store as MagentoStore;
 use TrustMate\Opinions\Logger\Logger;
 use TrustMate\Opinions\Model\Category;
@@ -42,6 +44,11 @@ class Review
     private $productRepository;
 
     /**
+     * @var Configurable
+     */
+    private $configurableType;
+
+    /**
      * @var Category
      */
     private $category;
@@ -61,18 +68,10 @@ class Review
      */
     private $logger;
 
-    /**
-     * @param ReviewModel $reviewModel
-     * @param ProductRepositoryInterface $productRepository
-     * @param Category $category
-     * @param Data $config
-     * @param Store $store
-     * @param Resolver $resolver
-     * @param Logger $logger
-     */
     public function __construct(
         ReviewModel $reviewModel,
         ProductRepositoryInterface $productRepository,
+        Configurable $configurableType,
         Category $category,
         Data $config,
         Store $store,
@@ -81,6 +80,7 @@ class Review
     ) {
         $this->reviewModel = $reviewModel;
         $this->productRepository = $productRepository;
+        $this->configurableType = $configurableType;
         $this->category = $category;
         $this->config = $config;
         $this->store = $store;
@@ -146,28 +146,71 @@ class Review
         ];
 
         if ($includeProducts) {
-            foreach ($order->getAllVisibleItems() as $item) {
-                $product = $item->getProduct();
-                $localId = $this->config->isFixLocalIdEnabled($storeId) ? $product->getId() : $product->getSku();
-                $store = $order->getStore();
-                $gtinCode = $this->config->getGtinCode($storeId);
-                $mpnCode = $this->config->getMpnCode($storeId);
+            $sendVariants = $this->config->sendVariantInformation($storeId);
+            foreach ($order->getAllItems() as $item) {
+                $productType = $item->getProductType();
+                $isChild = (bool) $item->getParentItemId();
+                $context = ($isChild ? 'child_' : 'parent_') . $productType;
 
-                $invitationData['products'][$product->getSku()] = [
-                    'id' => $localId,
-                    'name' => $product->getName(),
-                    'sku' => $product->getSku(),
-                    'product_url' => $product->getProductUrl(),
-                    'category' => $this->category->getCategoriesPath($product->getCategoryIds()),
-                    'image_url' => $this->getImageUrl($store, $product),
-                    'image_thumb_url' => $this->getImageUrl($store, $product, true),
-                    'gtin' => $gtinCode ? $product->getData($gtinCode) : null,
-                    'mpn' => $mpnCode ? $product->getData($mpnCode) : null
-                ];
+                switch ($context) {
+                    case 'parent_simple':
+                        $invitationData['products'][] = $this->prepareProductData($item, $order);
+                        break;
+
+                    case 'parent_bundle':
+                    case 'parent_configurable':
+                        if (!$sendVariants) {
+                            $invitationData['products'][] = $this->prepareProductData($item, $order);
+                        }
+
+                        break;
+                    case 'child_bundle':
+                    case 'child_configurable':
+                        if ($sendVariants) {
+                            $invitationData['products'][] = $this->prepareProductData($item, $order, $item->getParentItem());
+                        }
+
+                        break;
+                    case 'child_simple':
+                        $invitationData['products'][] = $this->prepareProductData($item, $order, $item->getParentItem());
+                        break;
+
+                    default:
+                        $invitationData['products'][] = $this->prepareProductData($item, $order, $item->getParentItem());
+                }
             }
         }
 
         return $invitationData;
+    }
+
+    /**
+     * @throws NoSuchEntityException
+     */
+    private function prepareProductData(Item|OrderItem $item, Order|OrderInterface $order, Item|OrderItem $parentItem = null): array
+    {
+        $storeId = (int) $order->getStore()->getId();
+        $product = $item->getProduct();
+        $groupId = ($parentItem) ? $parentItem->getId() : $item->getProductId();
+        $localId = $this->config->isFixLocalIdEnabled($storeId) ? $item->getId() : $item->getSku();
+        $gtinCode = $this->config->getGtinCode($storeId);
+        $mpnCode = $this->config->getMpnCode($storeId);
+
+        return [
+            'id' => $localId,
+            'name' => $product->getName(),
+            'sku' => $product->getSku(),
+            'product_url' => $this->getProductFrontendUrl(
+                $product,
+                $order->getStore()
+            ),
+            'category' => $this->category->getCategoriesPath($product->getCategoryIds()),
+            'image_url' => $this->getImageUrl($order->getStore(), $product),
+            'image_thumb_url' => $this->getImageUrl($order->getStore(), $product, true),
+            'gtin' => $gtinCode ? $product->getData($gtinCode) : null,
+            'mpn' => $mpnCode ? $product->getData($mpnCode) : null,
+            'group_id' => $groupId,
+        ];
     }
 
     private function getImageUrl(MagentoStore $store, Product $product, bool $thumbnail = false): string
@@ -177,6 +220,32 @@ class Review
             $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA),
             'catalog/product',
             ($thumbnail) ? $product->getThumbnail() : $product->getImage()
+        );
+    }
+
+    /**
+     * @throws NoSuchEntityException
+     */
+    private function getProductFrontendUrl(Product|OrderItem $product, MagentoStore $store): string
+    {
+        if (!$product instanceof Product) {
+            $product = $product->getProduct();
+        }
+
+        $parentIds = $this->configurableType->getParentIdsByChild(
+            (!$product instanceof Product) ? $product->getProductId() : $product->getId()
+        );
+        $urlKey = $product->getUrlKey();
+        if (!empty($parentIds)) {
+            $parent = $this->productRepository->getById($parentIds[0], false, $store->getId());
+            $urlKey = $parent->getUrlKey();
+        }
+
+        return sprintf(
+            '%s%s%s',
+            rtrim($store->getBaseUrl(), '/'),
+            '/' . $urlKey,
+            $store->getConfig('catalog/seo/product_url_suffix')
         );
     }
 }

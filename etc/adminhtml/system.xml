@@ -72,6 +72,18 @@
                         <field id="module_enabled">1</field>
                     </depends>
                 </field>
+                <field id="send_child" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send information about the product variant</label>
+                    <comment>
+                        WARNING!
+                        Enabling this option will send information about the product variant, not about the parent product. For example, when ordering a blue product, information will be sent specifically about that blue product, not about the main product that contains variants.
+                    </comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_model>TrustMate\Opinions\Block\Adminhtml\System\Config\ConfirmSwitch</frontend_model>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
     </system>

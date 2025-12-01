@@ -19,10 +19,10 @@ class Data
     public const COLLECT_AGREEMENTS_STATUS = 'trustmate_opinions_section/general/collect_agreements_with_trustmate';
     public const PRODUCTS_OPINIONS_STATUS = 'trustmate_opinions_section/general/products_opinions_enabled';
     public const INVITATION_EVENT = 'trustmate_opinions_section/general/invitation_event';
-    public const STORE_ID = 'trustmate_opinions_section/general/store_id';
     public const GTIN_CODE = 'trustmate_opinions_section/general/gtin_code';
     public const MPN_CODE = 'trustmate_opinions_section/general/mpn_code';
     public const FIX_LOCALID = 'trustmate_opinions_section/general/fix_localid';
+    public const SEND_VARIANT = 'trustmate_opinions_section/general/send_child';
 
     /**
      * @var ScopeConfigInterface
@@ -35,13 +35,6 @@ class Data
         $this->scopeConfigInterface = $scopeConfigInterface;
     }
 
-    /**
-     * Return status of module
-     *
-     * @param int|null $storeId
-     *
-     * @return bool
-     */
     public function isModuleEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfigInterface->isSetFlag(
@@ -51,13 +44,6 @@ class Data
         );
     }
 
-    /**
-     * Return status of sandbox
-     *
-     * @param int|null $storeId
-     *
-     * @return bool
-     */
     public function isSandboxEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfigInterface->isSetFlag(
@@ -67,14 +53,7 @@ class Data
         );
     }
 
-    /**
-     * Get Value of API Key
-     *
-     * @param int|null $storeId
-     *
-     * @return mixed
-     */
-    public function getApiKey(?int $storeId = null)
+    public function getApiKey(?int $storeId = null): string
     {
         return $this->scopeConfigInterface->getValue(
             self::API_KEY,
@@ -83,13 +62,6 @@ class Data
         );
     }
 
-    /**
-     * Check collect agreements status
-     *
-     * @param int|null $storeId
-     *
-     * @return bool
-     */
     public function isCollectAgreementsEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfigInterface->isSetFlag(
@@ -99,13 +71,6 @@ class Data
         );
     }
 
-    /**
-     * Check if collect additional review of product
-     *
-     * @param int|null $storeId
-     *
-     * @return bool
-     */
     public function isProductOpinionEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfigInterface->isSetFlag(
@@ -115,14 +80,7 @@ class Data
         );
     }
 
-    /**
-     * Get invitation event
-     *
-     * @param int|null $storeId
-     *
-     * @return mixed
-     */
-    public function getInvitationEvent(?int $storeId = null)
+    public function getInvitationEvent(?int $storeId = null): string
     {
         return $this->scopeConfigInterface->getValue(
             self::INVITATION_EVENT,
@@ -131,28 +89,7 @@ class Data
         );
     }
 
-    /**
-     * Get store id
-     *
-     * @return mixed
-     */
-    public function getStoreId(?int $storeId = null)
-    {
-        return $this->scopeConfigInterface->getValue(
-            self::STORE_ID,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-    }
-
-    /**
-     * Get GTIN attribute code
-     *
-     * @param int|null $storeId
-     *
-     * @return mixed
-     */
-    public function getGtinCode(?int $storeId = null)
+    public function getGtinCode(?int $storeId = null): string
     {
         return $this->scopeConfigInterface->getValue(
             self::GTIN_CODE,
@@ -161,14 +98,7 @@ class Data
         );
     }
 
-    /**
-     * Get MPN attribute code
-     *
-     * @param int|null $storeId
-     *
-     * @return mixed
-     */
-    public function getMpnCode(?int $storeId = null)
+    public function getMpnCode(?int $storeId = null): string
     {
         return $this->scopeConfigInterface->getValue(
             self::MPN_CODE,
@@ -177,17 +107,19 @@ class Data
         );
     }
 
-    /**
-     * Return status of module
-     *
-     * @param int|null $storeId
-     *
-     * @return bool
-     */
     public function isFixLocalIdEnabled(?int $storeId = null): bool
     {
         return $this->scopeConfigInterface->isSetFlag(
             self::FIX_LOCALID,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function sendVariantInformation(?int $storeId = null): bool
+    {
+        return $this->scopeConfigInterface->isSetFlag(
+            self::SEND_VARIANT,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );

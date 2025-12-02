@@ -40,6 +40,10 @@ class Reviews implements ResolverInterface
      * @var CollectionFactory
      */
     private $trustmateCollectionFactory;
+    /**
+     * @var MagentoReviewCollectionFactory
+     */
+    private  $magentoReviewCollectionFactory;
 
     /**
      * @param ProductReviewsDataProvider     $productReviewsDataProvider

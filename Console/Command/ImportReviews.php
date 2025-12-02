@@ -139,7 +139,7 @@ class ImportReviews extends Command
 
         $output->writeln('<info>Finish importing</info>');
 
-        return 1;
+        return 0;
     }
 
     /**

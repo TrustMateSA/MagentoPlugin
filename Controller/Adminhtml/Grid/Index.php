@@ -39,6 +39,15 @@ class Index extends Action
     }
 
     /**
+     * @return bool
+     */
+    protected function _isAllowed(): bool
+    {
+        return $this->_authorization->isAllowed('TrustMate_Opinions::menu');
+    }
+
+
+    /**
      * @return Page
      */
     public function execute(): Page

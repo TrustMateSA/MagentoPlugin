@@ -56,7 +56,7 @@ class TrustMateRestApi
                     : TrustMateApiEnum::PRODUCTION_URL,
                 'headers' => [
                     'x-api-key' => $this->configData->getApiKey($storeId),
-                    'Accept' => 'application/json"'
+                    'Accept' => 'application/json'
                 ]
             ]
         ]);

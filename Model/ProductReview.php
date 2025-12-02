@@ -20,7 +20,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getId(): ?string
     {
@@ -28,7 +28,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setId($id): ?ProductReviewInterface
     {
@@ -36,7 +36,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getCreatedAt(): ?string
     {
@@ -44,7 +44,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setCreatedAt($date): ?ProductReviewInterface
     {
@@ -52,7 +52,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getGrade(): ?string
     {
@@ -60,7 +60,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setGrade($grade): ?ProductReviewInterface
     {
@@ -68,7 +68,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getAuthorEmail(): ?string
     {
@@ -76,7 +76,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setAuthorEmail($email): ?ProductReviewInterface
     {
@@ -84,7 +84,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getAuthorName(): ?string
     {
@@ -92,7 +92,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setAuthorName($name): ?ProductReviewInterface
     {
@@ -100,7 +100,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getProduct(): ?string
     {
@@ -108,7 +108,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setProduct($product): ?ProductReviewInterface
     {
@@ -116,7 +116,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getBody(): ?string
     {
@@ -124,7 +124,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setBody($body): ?ProductReviewInterface
     {
@@ -132,7 +132,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getPublicIdentifier(): ?string
     {
@@ -140,7 +140,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setPublicIdentifier($publicIdentifier): ?ProductReviewInterface
     {
@@ -148,7 +148,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getExtensionAttributes(): ?ProductReviewExtensionInterface
     {
@@ -156,7 +156,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setExtensionAttributes(ProductReviewExtensionInterface $extensionAttributes): ProductReviewInterface
     {
@@ -164,7 +164,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getUpdatedAt(): ?string
     {
@@ -172,7 +172,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setUpdatedAt($date): ?ProductReviewInterface
     {
@@ -180,7 +180,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getLanguage(): ?string
     {
@@ -188,7 +188,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setLanguage($language): ?ProductReviewInterface
     {
@@ -196,7 +196,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getOriginalBody(): ?string
     {
@@ -204,7 +204,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setOriginalBody($originalBody): ?ProductReviewInterface
     {
@@ -212,7 +212,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getOrderIncrementId(): ?string
     {
@@ -220,7 +220,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setOrderIncrementId($orderIncrementId): ?ProductReviewInterface
     {
@@ -228,7 +228,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getGtinCode(): ?string
     {
@@ -236,7 +236,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setGtinCode($gtinCode): ?ProductReviewInterface
     {
@@ -244,7 +244,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getMpnCode(): ?string
     {
@@ -252,7 +252,7 @@ class ProductReview extends AbstractExtensibleModel implements ProductReviewInte
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function setMpnCode($mpnCode): ?ProductReviewInterface
     {

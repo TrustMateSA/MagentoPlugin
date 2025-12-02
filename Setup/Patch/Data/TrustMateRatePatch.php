@@ -79,7 +79,7 @@ class TrustMateRatePatch implements DataPatchInterface
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public static function getDependencies(): array
     {
@@ -87,7 +87,7 @@ class TrustMateRatePatch implements DataPatchInterface
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      */
     public function getAliases(): array
     {
@@ -95,7 +95,7 @@ class TrustMateRatePatch implements DataPatchInterface
     }
 
     /**
-     * @inheirtDoc
+     * @inheritDoc
      *
      * @throws AlreadyExistsException
      */

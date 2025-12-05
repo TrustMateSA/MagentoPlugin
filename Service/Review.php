@@ -14,20 +14,17 @@ use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Locale\Resolver;
 use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item as OrderItem;
-use Magento\Store\Api\Data\StoreConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store as MagentoStore;
 use TrustMate\Opinions\Logger\Logger;
 use TrustMate\Opinions\Model\Category;
 use TrustMate\Opinions\Model\Config\Data;
 use TrustMate\Opinions\Model\Review as ReviewModel;
-use TrustMate\Opinions\Model\Store;
 
 class Review
 {
@@ -143,34 +140,60 @@ class Review
             $sendVariants = $this->config->sendVariantInformation($storeId);
             foreach ($order->getAllItems() as $item) {
                 $productType = $item->getProductType();
+                $product = $item->getProduct();
                 $isChild = (bool) $item->getParentItemId();
                 $context = ($isChild ? 'child_' : 'parent_') . $productType;
 
                 switch ($context) {
                     case 'parent_simple':
-                        $invitationData['products'][] = $this->prepareProductData($item, $order);
+                        $invitationData['products'][$product->getSku()] = $this->prepareProductData($product, $order);
                         break;
 
                     case 'parent_bundle':
                     case 'parent_configurable':
                         if (!$sendVariants) {
-                            $invitationData['products'][] = $this->prepareProductData($item, $order);
+                            $invitationData['products'][$product->getSku()] = $this->prepareProductData($product, $order);
                         }
 
                         break;
                     case 'child_bundle':
                     case 'child_configurable':
                         if ($sendVariants) {
-                            $invitationData['products'][] = $this->prepareProductData($item, $order, $item->getParentItem());
+                            $invitationData['products'][$product->getSku()] = $this->prepareProductData($product, $order, $item->getParentItem());
                         }
 
                         break;
                     case 'child_simple':
-                        $invitationData['products'][] = $this->prepareProductData($item, $order, $item->getParentItem());
+                        if ($item->getParentItemId()) {
+                            $parentType = $item->getParentItem()->getProductType();
+                            if (in_array($parentType, ['configurable', 'bundle']) && !$sendVariants) {
+                                break;
+                            }
+                        }
+
+                        $invitationData['products'][$product->getSku()] = $this->prepareProductData(
+                            $product,
+                            $order,
+                            $item->getParentItem()
+                        );
                         break;
 
                     default:
-                        $invitationData['products'][] = $this->prepareProductData($item, $order, $item->getParentItem());
+                        $parentIds = $this->configurableType->getParentIdsByChild($product->getId());
+                        if (($parentIds || $item->getParentItemId()) && !$sendVariants) {
+                            $parentType = $item->getParentItem()->getProductType();
+                            if (in_array($parentType, ['configurable', 'bundle']) && !$sendVariants) {
+                                break;
+                            }
+
+                            $product = $this->productRepository->getById((int) $parentIds[0]);
+                        }
+
+                        $invitationData['products'][$product->getSku()] = $this->prepareProductData(
+                            $product,
+                            $order,
+                            $item->getParentItem()
+                        );
                 }
             }
         }
@@ -181,12 +204,11 @@ class Review
     /**
      * @throws NoSuchEntityException
      */
-    private function prepareProductData(Item|OrderItem $item, Order|OrderInterface $order, Item|OrderItem $parentItem = null): array
+    private function prepareProductData(Product $product, Order|OrderInterface $order, Item|OrderItem $parentItem = null): array
     {
         $storeId = (int) $order->getStore()->getId();
-        $product = $item->getProduct();
-        $groupId = ($parentItem) ? $parentItem->getId() : $item->getProductId();
-        $localId = $this->config->isFixLocalIdEnabled($storeId) ? $item->getId() : $item->getSku();
+        $groupId = ($parentItem) ? $parentItem->getProductId() : $product->getId();
+        $localId = $this->config->isFixLocalIdEnabled($storeId) ? $product->getId() : $product->getSku();
         $gtinCode = $this->config->getGtinCode($storeId);
         $mpnCode = $this->config->getMpnCode($storeId);
 
@@ -220,15 +242,9 @@ class Review
     /**
      * @throws NoSuchEntityException
      */
-    private function getProductFrontendUrl(Product|OrderItem $product, MagentoStore $store): string
+    private function getProductFrontendUrl(Product $product, MagentoStore $store): string
     {
-        if (!$product instanceof Product) {
-            $product = $product->getProduct();
-        }
-
-        $parentIds = $this->configurableType->getParentIdsByChild(
-            (!$product instanceof Product) ? $product->getProductId() : $product->getId()
-        );
+        $parentIds = $this->configurableType->getParentIdsByChild($product->getId());
         $urlKey = $product->getUrlKey();
         if (!empty($parentIds)) {
             $parent = $this->productRepository->getById($parentIds[0], false, $store->getId());

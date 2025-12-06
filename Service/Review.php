@@ -146,20 +146,20 @@ class Review
 
                 switch ($context) {
                     case 'parent_simple':
-                        $invitationData['products'][$product->getSku()] = $this->prepareProductData($product, $order);
+                        $invitationData['products'][$product->getId()] = $this->prepareProductData($product, $order);
                         break;
 
                     case 'parent_bundle':
                     case 'parent_configurable':
                         if (!$sendVariants) {
-                            $invitationData['products'][$product->getSku()] = $this->prepareProductData($product, $order);
+                            $invitationData['products'][$product->getId()] = $this->prepareProductData($product, $order);
                         }
 
                         break;
                     case 'child_bundle':
                     case 'child_configurable':
                         if ($sendVariants) {
-                            $invitationData['products'][$product->getSku()] = $this->prepareProductData($product, $order, $item->getParentItem());
+                            $invitationData['products'][$product->getId()] = $this->prepareProductData($product, $order, $item->getParentItem());
                         }
 
                         break;
@@ -171,7 +171,7 @@ class Review
                             }
                         }
 
-                        $invitationData['products'][$product->getSku()] = $this->prepareProductData(
+                        $invitationData['products'][$product->getId()] = $this->prepareProductData(
                             $product,
                             $order,
                             $item->getParentItem()
@@ -189,7 +189,7 @@ class Review
                             $product = $this->productRepository->getById((int) $parentIds[0]);
                         }
 
-                        $invitationData['products'][$product->getSku()] = $this->prepareProductData(
+                        $invitationData['products'][$product->getId()] = $this->prepareProductData(
                             $product,
                             $order,
                             $item->getParentItem()

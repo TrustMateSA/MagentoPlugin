@@ -61,22 +61,11 @@
                         <field id="module_enabled">1</field>
                     </depends>
                 </field>
-                <field id="fix_localid" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Use product ID instead of SKU</label>
-                    <comment>
-                        Used only for backward compatibility with some module versions. Turn it on only if your
-                        product local id in TrustMate panel already are non-SKUs.
-                    </comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="module_enabled">1</field>
-                    </depends>
-                </field>
                 <field id="send_child" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use product variants in invitations</label>
                     <comment><![CDATA[
                         WARNING!
-                        <br /><br />
+                        <br />
                         If you were already collecting product reviews (in versions <= 3.0.9), turning this option on may
                         lead to creating many new products (variants) on TrustMate side. Not all reviews may be visible,
                         depending on if products were properly grouped (group_id field). When in doubt, leave this option
@@ -86,6 +75,17 @@
                     ]]></comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <frontend_model>TrustMate\Opinions\Block\Adminhtml\System\Config\ConfirmSwitch</frontend_model>
+                    <depends>
+                        <field id="module_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="fix_localid" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use product ID instead of SKU</label>
+                    <comment>
+                        Used only for backward compatibility with some module versions. Turn it on only if your
+                        product local id in TrustMate panel already are non-SKUs. In most cases, this should be left disabled.
+                    </comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="module_enabled">1</field>
                     </depends>

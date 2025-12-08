@@ -60,6 +60,10 @@ php bin/magento trustmate:import:opinions
 
 #### Changelog
 
+##### 3.0.10 (2025-12-08)
+- Added support for product variants (for existing integration: please read new option description)
+- Made sure invtiations are created for proper store view in all cases
+
 ##### 3.0.9 (2025-10-01)
 - Attempt to fix rare case when invitations were created for wrong store
 

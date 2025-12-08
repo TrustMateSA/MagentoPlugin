@@ -73,10 +73,16 @@
                     </depends>
                 </field>
                 <field id="send_child" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Send information about the product variant</label>
+                    <label>Use product variants in invitations</label>
                     <comment>
                         WARNING!
-                        Enabling this option will send information about the product variant, not about the parent product. For example, when ordering a blue product, information will be sent specifically about that blue product, not about the main product that contains variants.
+                        <br /><br />
+                        If you were already collecting product reviews (in versions &lt;= 3.0.9), turning this option on may
+                        lead to creating many new products (variants) on TrustMate side. Not all reviews may be visible,
+                        depending on if products were properly grouped (group_id field). When in doubt, leave this option
+                        disabled and contact TrustMate support.
+                        <br /><br />
+                        If you're just starting to collect product reviews, enabling this is generally recommended.
                     </comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <frontend_model>TrustMate\Opinions\Block\Adminhtml\System\Config\ConfirmSwitch</frontend_model>

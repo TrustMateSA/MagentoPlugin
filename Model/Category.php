@@ -30,7 +30,7 @@ class Category
      */
     public function __construct(
         CategoryRepositoryInterface $categoryRepositoryInterface,
-        StoreManagerInterface       $storeManager
+        StoreManagerInterface $storeManager
     ) {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->storeManager = $storeManager;

@@ -12,7 +12,6 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote\Item;
@@ -24,15 +23,9 @@ use Magento\Store\Model\Store as MagentoStore;
 use TrustMate\Opinions\Logger\Logger;
 use TrustMate\Opinions\Model\Category;
 use TrustMate\Opinions\Model\Config\Data;
-use TrustMate\Opinions\Model\Review as ReviewModel;
 
 class Review
 {
-    /**
-     * @var ReviewModel
-     */
-    private $reviewModel;
-
     /**
      * @var Data
      */
@@ -64,7 +57,6 @@ class Review
     private $logger;
 
     public function __construct(
-        ReviewModel $reviewModel,
         ProductRepositoryInterface $productRepository,
         Configurable $configurableType,
         Category $category,
@@ -72,49 +64,12 @@ class Review
         Data $config,
         Logger $logger
     ) {
-        $this->reviewModel = $reviewModel;
         $this->productRepository = $productRepository;
         $this->configurableType = $configurableType;
         $this->category = $category;
         $this->scopeConfig = $scopeConfig;
         $this->config = $config;
         $this->logger = $logger;
-    }
-
-    /**
-     * @throws LocalizedException
-     */
-    public function prepareDataToSave(array $item, int $storeId, bool $translation = false): array
-    {
-        $originalBody = (!isset($item['originalBody']) || !$item['originalBody']) ? null : $item['originalBody'];
-        $productId = $item['product']['localId'];
-        if ($this->config->isFixLocalIdEnabled()) {
-            try {
-                $product = $this->productRepository->get($item['product']['localId']);
-                $productId = $product->getId();
-            } catch (NoSuchEntityException $e) {
-                $this->logger->info($e->getMessage());
-            }
-        }
-
-        return [
-            'id' => $this->reviewModel->checkIfExists($item['publicIdentifier'], $originalBody, $translation),
-            'created_at' => $item['createdAt'],
-            'updated_at' => $item['updatedAt'],
-            'grade' => $item['grade'],
-            'author_email' => $item['author']['email'],
-            'author_name' => $item['author']['name'],
-            'product' => $productId,
-            'body' => !$item['body'] ? ' ' : $item['body'],
-            'public_identifier' => $item['publicIdentifier'],
-            'language' => $item['language'],
-            'original_body' => $originalBody,
-            'order_increment_id' => $item['orderIdentifier'],
-            'gtin_code' => $item['product']['gtin'],
-            'mpn_code' => $item['product']['mpn'],
-            'status' => $item['status'],
-            'store_id' => $storeId
-        ];
     }
 
     /**

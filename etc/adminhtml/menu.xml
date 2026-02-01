@@ -6,15 +6,6 @@
              sortOrder="10"
              resource="TrustMate_Opinions::menu"
         />
-        <add id="TrustMate_Opinions::opinions"
-             title="Product reviews"
-             module="TrustMate_Opinions"
-             sortOrder="10"
-             translate="title"
-             parent="TrustMate_Opinions::menu"
-             resource="Magento_Backend::content"
-             action="opinions/grid"
-        />
         <add id="TrustMate_Opinions::settings"
              title="Settings"
              module="TrustMate_Opinions"

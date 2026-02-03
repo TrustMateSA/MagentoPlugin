@@ -10,7 +10,7 @@ namespace TrustMate\Opinions\Enum;
 
 class TrustMateApiEnum
 {
-    public const PRODUCTION_URL = 'https://trustmate.io/public/api' . DIRECTORY_SEPARATOR;
-    public const SANDBOX_URL = 'https://trustmate.tech/public/api' . DIRECTORY_SEPARATOR;
+    public const PRODUCTION_URL = 'https://trustmate.io/integration/v1/api' . DIRECTORY_SEPARATOR;
+    public const SANDBOX_URL = 'https://trustmate.tech/integration/v1/api' . DIRECTORY_SEPARATOR;
     public const INVITATION_ENDPOINT = 'invitation';
 }

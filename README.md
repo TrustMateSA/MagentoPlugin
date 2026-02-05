@@ -21,11 +21,17 @@ In System → Tools → Cache management → Flush Magento Cache or from command
 
 # Important notice about displaying reviews using this module
 
-Version 3.0.x is a last version that will allow presentqing TrustMate reviews using this module.
-This feature will be removed in version 3.1.x. Using TrustMate widget or creating custom integration
+Version 3.0.x was a last version presenting TrustMate reviews on top of Magento review system
+using this module.
+This feature was removed in 4.0.0. Using TrustMate widgets or creating custom integration
 using our APIs is recommended.
 
 # Upgrading
+
+## To version 4.0.0
+
+Review presentation built on top Magento review system was removed. Reviews in database were left
+untouched for manual action.
 
 ## To version 3.0.0 from version 1.2.0+ if you render reviews using module
 
@@ -60,9 +66,13 @@ php bin/magento trustmate:import:opinions
 
 #### Changelog
 
+##### 4.0.0 (2026-02-06)
+- Removed review presentation built on top of Magento reviews
+- Switched to TrustMate Integration API
+
 ##### 3.0.10 (2025-12-08)
 - Added support for product variants (for existing integration: please read new option description)
-- Made sure invtiations are created for proper store view in all cases
+- Made sure invitations are created for proper store view in all cases
 
 ##### 3.0.9 (2025-10-01)
 - Attempt to fix rare case when invitations were created for wrong store

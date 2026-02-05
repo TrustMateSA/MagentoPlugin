@@ -88,7 +88,7 @@ class Review
             'send_to' => $order->getCustomerEmail(),
             'order_number' => $order->getIncrementId(),
             'language' => strstr($localeCode, '_', true),
-            'source_type' => 'magento3.0'
+            'source_type' => 'magento4.0'
         ];
 
         if ($includeProducts) {

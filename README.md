@@ -66,7 +66,7 @@ php bin/magento trustmate:import:opinions
 
 #### Changelog
 
-##### 4.0.0 (2026-02-06)
+##### 4.0.0 (2026-02-05)
 - Removed review presentation built on top of Magento reviews
 - Switched to TrustMate Integration API
 

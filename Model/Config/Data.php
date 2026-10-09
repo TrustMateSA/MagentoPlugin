@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace TrustMate\Opinions\Model\Config;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Store\Model\ScopeInterface;
 
 class Data
@@ -26,14 +27,26 @@ class Data
     public const SEND_VARIANT = 'trustmate_opinions_section/general/send_child';
 
     /**
+     * EncryptorInterface::encrypt() output: "<key version>:<cipher version>:<payload>"
+     */
+    public const ENCRYPTED_VALUE_PATTERN = '/^\d+:\d+:/';
+
+    /**
      * @var ScopeConfigInterface
      */
     private $scopeConfigInterface;
 
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
     public function __construct(
-        ScopeConfigInterface $scopeConfigInterface
+        ScopeConfigInterface $scopeConfigInterface,
+        EncryptorInterface $encryptor
     ) {
         $this->scopeConfigInterface = $scopeConfigInterface;
+        $this->encryptor = $encryptor;
     }
 
     public function isModuleEnabled(?int $storeId = null): bool
@@ -56,11 +69,14 @@ class Data
 
     public function getApiKey(?int $storeId = null): string
     {
-        return $this->scopeConfigInterface->getValue(
+        $apiKey = (string) $this->scopeConfigInterface->getValue(
             self::API_KEY,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
+
+        // Key set in app/etc/config.php or env.php before it became encrypted is still plain text
+        return preg_match(self::ENCRYPTED_VALUE_PATTERN, $apiKey) ? $this->encryptor->decrypt($apiKey) : $apiKey;
     }
 
     public function isCollectAgreementsEnabled(?int $storeId = null): bool
@@ -83,7 +99,7 @@ class Data
 
     public function getInvitationEvent(?int $storeId = null): string
     {
-        return $this->scopeConfigInterface->getValue(
+        return (string) $this->scopeConfigInterface->getValue(
             self::INVITATION_EVENT,
             ScopeInterface::SCOPE_STORE,
             $storeId

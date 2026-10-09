@@ -10,23 +10,20 @@ namespace TrustMate\Opinions\Http\Client;
 
 use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\ResponseFactory;
 use Magento\Framework\Webapi\Rest\Request;
+use Psr\Http\Message\ResponseInterface;
 use TrustMate\Opinions\Enum\TrustMateApiEnum;
 use TrustMate\Opinions\Model\Config\Data;
 
 class TrustMateRestApi
 {
+    private const CONNECT_TIMEOUT = 5;
+    private const TIMEOUT = 10;
+
     /**
      * @var ClientFactory
      */
     private $clientFactory;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
 
     /**
      * @var Data
@@ -35,20 +32,21 @@ class TrustMateRestApi
 
     public function __construct(
         ClientFactory $clientFactory,
-        ResponseFactory $responseFactory,
         Data $configData
     ) {
         $this->clientFactory = $clientFactory;
-        $this->responseFactory = $responseFactory;
         $this->configData = $configData;
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function doRequest(
         int $storeId,
         string $endpoint,
         array $data = [],
         string $method = Request::HTTP_METHOD_GET
-    ): Response {
+    ): ResponseInterface {
         $client = $this->clientFactory->create([
             'config' => [
                 'base_uri' => ($this->configData->isSandboxEnabled($storeId))
@@ -56,24 +54,19 @@ class TrustMateRestApi
                     : TrustMateApiEnum::PRODUCTION_URL,
                 'headers' => [
                     'x-api-key' => $this->configData->getApiKey($storeId),
-                    'Accept' => 'application/json"'
-                ]
+                    'Accept' => 'application/json'
+                ],
+                'connect_timeout' => self::CONNECT_TIMEOUT,
+                'timeout' => self::TIMEOUT,
+                // Guzzle keeps custom headers (x-api-key) on cross-host and https->http redirects
+                'allow_redirects' => false
             ]
         ]);
 
-        try {
-            $response = $client->request(
-                $method,
-                $endpoint,
-                $data
-            );
-        } catch (GuzzleException $exception) {
-            $response = $this->responseFactory->create([
-                'status' => $exception->getCode(),
-                'reason' => $exception->getMessage()
-            ]);
-        }
-
-        return $response;
+        return $client->request(
+            $method,
+            $endpoint,
+            $data
+        );
     }
 }

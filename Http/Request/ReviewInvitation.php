@@ -8,9 +8,10 @@ declare(strict_types=1);
 
 namespace TrustMate\Opinions\Http\Request;
 
-use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Webapi\Rest\Request;
+use Psr\Http\Message\ResponseInterface;
 use TrustMate\Opinions\Enum\TrustMateApiEnum;
 use TrustMate\Opinions\Http\Client\TrustMateRestApi;
 
@@ -45,15 +46,16 @@ class ReviewInvitation
      * @param int   $storeId
      *
      * @return array|bool|float|int|string|null
+     * @throws GuzzleException on connection error and 4xx/5xx response
+     * @throws \RuntimeException on any other non-200 response
      */
     public function sendRequest(array $data, int $storeId)
     {
         $response = $this->create($data, $storeId);
         if ($response->getStatusCode() !== 200) {
-            return [
-                'status' => $response->getStatusCode(),
-                'message' => $response->getReasonPhrase()
-            ];
+            throw new \RuntimeException(
+                sprintf('Unexpected response: %d %s', $response->getStatusCode(), $response->getReasonPhrase())
+            );
         }
 
         $bodyContent = $response->getBody()->getContents();
@@ -67,9 +69,10 @@ class ReviewInvitation
      * @param array $data
      * @param int   $storeId
      *
-     * @return Response
+     * @return ResponseInterface
+     * @throws GuzzleException
      */
-    protected function create(array $data, int $storeId): Response
+    protected function create(array $data, int $storeId): ResponseInterface
     {
         return $this->apiService->doRequest(
             $storeId,

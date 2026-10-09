@@ -33,9 +33,10 @@
                         <field id="module_enabled">1</field>
                     </depends>
                 </field>
-                <field id="api_key" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_key" translate="label" type="obscure" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                     <validate>required-entry</validate>
                     <label>API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <depends>
                         <field id="module_enabled">1</field>
                     </depends>

@@ -23,13 +23,7 @@
         </arguments>
     </virtualType>
 
-    <type name="TrustMate\Opinions\Observer\Checkout\Submit">
-        <arguments>
-            <argument name="logger" xsi:type="object">TrustMateLogger</argument>
-        </arguments>
-    </type>
-
-    <type name="TrustMate\Opinions\Controller\Adminhtml\Order\Shipment\Save">
+    <type name="TrustMate\Opinions\Service\InvitationSender">
         <arguments>
             <argument name="logger" xsi:type="object">TrustMateLogger</argument>
         </arguments>
@@ -39,5 +33,13 @@
         <plugin name="trustmate_after_create_shipment"
                 type="TrustMate\Opinions\Plugin\Magento\Sales\Api\ShipOrder"
                 sortOrder="20" disabled="false"/>
+    </type>
+
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="trustmate_opinions_section/general/api_key" xsi:type="string">1</item>
+            </argument>
+        </arguments>
     </type>
 </config>

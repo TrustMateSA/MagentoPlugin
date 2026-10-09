@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace TrustMate\Opinions\Service;
 
+use DateTimeImmutable;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
@@ -87,6 +88,7 @@ class Review
             'customer_name' => $order->getCustomerFirstname(),
             'send_to' => $order->getCustomerEmail(),
             'order_number' => $order->getIncrementId(),
+            'order_created_at' => (new DateTimeImmutable($order->getCreatedAt() ?? 'now'))->format('Y-m-d'),
             'language' => strstr($localeCode, '_', true),
             'source_type' => 'magento4.0'
         ];

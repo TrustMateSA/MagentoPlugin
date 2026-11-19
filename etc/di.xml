@@ -23,6 +23,12 @@
         </arguments>
     </virtualType>
 
+    <type name="TrustMate\Opinions\Http\Client\TrustMateRestApi">
+        <arguments>
+            <argument name="logger" xsi:type="object">TrustMateLogger</argument>
+        </arguments>
+    </type>
+
     <type name="TrustMate\Opinions\Observer\Checkout\Submit">
         <arguments>
             <argument name="logger" xsi:type="object">TrustMateLogger</argument>

@@ -10,9 +10,11 @@ namespace TrustMate\Opinions\Http\Client;
 
 use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ResponseFactory;
 use Magento\Framework\Webapi\Rest\Request;
+use Psr\Log\LoggerInterface;
 use TrustMate\Opinions\Enum\TrustMateApiEnum;
 use TrustMate\Opinions\Model\Config\Data;
 
@@ -33,14 +35,21 @@ class TrustMateRestApi
      */
     private $configData;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     public function __construct(
         ClientFactory $clientFactory,
         ResponseFactory $responseFactory,
-        Data $configData
+        Data $configData,
+        LoggerInterface $logger
     ) {
         $this->clientFactory = $clientFactory;
         $this->responseFactory = $responseFactory;
         $this->configData = $configData;
+        $this->logger = $logger;
     }
 
     public function doRequest(
@@ -68,9 +77,16 @@ class TrustMateRestApi
                 $data
             );
         } catch (GuzzleException $exception) {
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+
+            if ($exception instanceof RequestException && $exception->hasResponse()) {
+                return $exception->getResponse();
+            }
+
+            $status = (int) $exception->getCode();
             $response = $this->responseFactory->create([
-                'status' => $exception->getCode(),
-                'reason' => $exception->getMessage()
+                'status' => ($status >= 400 && $status <= 599) ? $status : 503,
+                'reason' => 'TrustMate API request failed'
             ]);
         }
 
